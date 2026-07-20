@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMPLE_3 / 02 ML API - 상세가이드</title>
+<style>
+  :root{ --ink:#222; --muted:#777; --line:#eaeaea; --accent:#2f6feb; --do:#1a9e6a; --code:#f5f6f8; --out:#f2f8f4; --out-b:#cfe6d8; --warn:#d9822b; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic",sans-serif;line-height:1.75;font-size:16px}
+  .wrap{max-width:840px;margin:0 auto;padding:44px 22px 90px}
+  .kicker{color:var(--accent);font-weight:600;font-size:13px}
+  h1{margin:8px 0 6px;font-size:26px;font-weight:700}.sub{color:var(--muted);margin:0 0 12px}.meta{color:var(--muted);font-size:14px;margin:0 0 4px}
+  .flow{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px 15px;margin:14px 0;font-size:14px;color:#444}.flow b{color:var(--accent)}
+  .hint{font-size:13px;color:var(--muted);margin:8px 0 0}
+  section{padding:26px 0;border-bottom:1px solid var(--line)}section:last-of-type{border-bottom:none}
+  h2{margin:0 0 4px;font-size:19px;font-weight:700}h2 .n{color:var(--accent);margin-right:8px}h3{margin:18px 0 4px;font-size:16px}
+  .lead{color:var(--muted);margin:2px 0 10px}
+  .note{margin:12px 0;padding-left:14px;border-left:3px solid var(--line)}.note .tag{font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase}
+  .note.do{border-left-color:var(--do)}.note.do .tag{color:var(--do)}.note.say{border-left-color:var(--accent)}.note.say .tag{color:var(--accent)}
+  .note.exp{border-left-color:var(--do);background:#fbfefc}.note.exp .tag{color:var(--do)}.note p{margin:3px 0}
+  .note.warn{border-left-color:var(--warn);background:#fffdf7}.note.warn .tag{color:var(--warn)}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:13px 15px;overflow:auto;font-family:Consolas,"D2Coding",monospace;font-size:13.5px;line-height:1.6;margin:12px 0;color:#1b1f24}pre .cmt{color:#9aa0a6}
+  .out{margin:10px 0}
+  .out .olabel{font-size:12px;font-weight:700;color:var(--do);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px}
+  .out pre{background:var(--out);border:1px solid var(--out-b);color:#123}
+  .out pre .trunc{color:#9aa0a6}
+  .out.pred .olabel{color:var(--warn)}
+  .out.pred pre{background:#fffdf7;border-color:#f0dcc0}
+  code{background:#f0f1f3;border-radius:5px;padding:1px 6px;font-family:Consolas,monospace;font-size:14px}
+  ul,ol{margin:8px 0;padding-left:20px}li{margin:3px 0}.rule{font-weight:700;color:var(--accent)}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}th,td{border:1px solid var(--line);padding:7px 10px;text-align:left}th{background:#fafbfc}
+  .tt{border-bottom:1px dotted var(--accent);cursor:help;position:relative}
+  .tt:hover::after{content:attr(data-tip);position:absolute;left:0;bottom:135%;background:#222;color:#fff;padding:7px 10px;border-radius:6px;font-size:12.5px;font-weight:400;line-height:1.55;white-space:normal;width:max-content;max-width:280px;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  .tt:hover::before{content:'';position:absolute;left:12px;bottom:120%;border:6px solid transparent;border-top-color:#222;z-index:20}
+  footer{color:var(--muted);font-size:13px;margin-top:32px}
+  .layout{display:flex;align-items:flex-start;max-width:1180px;margin:0 auto}
+  .side{position:sticky;top:0;align-self:flex-start;flex:0 0 190px;max-height:100vh;overflow-y:auto;padding:44px 14px 40px;border-right:1px solid var(--line);font-size:13.5px}
+  .side-title{font-weight:700;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;padding-left:8px}
+  .side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .side a:hover{background:var(--code);color:var(--accent)}
+  .side a.act{color:var(--accent);font-weight:600;background:var(--code)}
+  .layout .wrap{margin:0 auto}
+  .src{font-size:13px;color:var(--muted);margin:8px 0 0}.src a{color:var(--accent);text-decoration:none;border-bottom:1px solid #cfe0ff}.src a:hover{border-bottom-color:var(--accent)}
+  .ds{margin:14px 0;border:1px solid var(--line);border-radius:8px;background:#fcfdff}
+  .ds>summary{cursor:pointer;padding:11px 15px;font-weight:700;font-size:14px;color:var(--accent);list-style:none}
+  .ds>summary::-webkit-details-marker{display:none}
+  .ds>summary::before{content:"\25B8  "}
+  .ds[open]>summary::before{content:"\25BE  "}
+  .ds .dsbody{padding:2px 15px 14px}
+  .ds h4{margin:15px 0 4px;font-size:14px;color:var(--ink);border-left:3px solid var(--accent);padding-left:8px}
+  .ds p{margin:4px 0;font-size:14px}
+  .ds table{margin:6px 0;font-size:13.5px}
+  .ds .approach{padding-left:2px;margin:5px 0}
+  .ds .tag2{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:10px;background:var(--code);color:var(--accent);margin-right:6px}
+  @media (max-width:760px){.layout{flex-direction:column}.side{position:static;flex:none;width:100%;max-height:none;border-right:none;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:2px;padding:14px}.side-title{width:100%}}
+  @media print{.side{display:none}.layout{display:block}section{page-break-inside:avoid}.tt{border:none}}
+</style>
+</head>
+<body>
+<div class="layout"><nav class="side"><div class="side-title">목차</div><a href="#concept">개념</a><a href="#files">파일 구성</a><div style="font-size:11px;color:#9aa0a6;font-weight:700;margin:10px 0 3px;padding-left:9px">코드 작성 순서</div><a href="#c1">1. requirements</a><a href="#c2">2. model.py</a><a href="#c3">3. main.py 뼈대</a><a href="#c4">4. 요청 스키마</a><a href="#c5">5. /health · /spec</a><a href="#c6">6. /predict</a><a href="#c7">7. store.py (DB)</a><a href="#c8">8. CRUD 엔드포인트</a><a href="#c9">9. Dockerfile</a><div style="font-size:11px;color:#9aa0a6;font-weight:700;margin:10px 0 3px;padding-left:9px">실행 실습</div><a href="#r1">1. 설치·실행</a><a href="#r2">2. Swagger</a><a href="#r3">3. 상태·정의</a><a href="#r4">4. 예측</a><a href="#r5">5. C 저장</a><a href="#r6">6. R 조회</a><a href="#r7">7. U 수정</a><a href="#r8">8. D 삭제</a><a href="#r9">9. 404</a><a href="#r10">10. 도커</a><a href="#wrap">마무리</a></nav>
+  <div class="wrap">
+  <div class="kicker">실습 상세가이드 · 빅데이터 분석 모델링 · SAMPLE_3 / 02</div>
+  <h1>02. ML API — model.pkl 을 서비스하기</h1>
+  <p class="sub">01에서 학습한 모델을 FastAPI로 감싸 REST API로 만든다. 코드를 순서대로 직접 작성한 뒤, 실행해서 호출해 본다.</p>
+  <p class="meta">대상: 비전공 초보 · 소요: 약 3시간 · 선수: 01 완료(model.pkl 필요) · 포트: 8003</p>
+  <div class="flow"><b>이 문서는 두 부분입니다</b> — <b style="color:#2f6feb">1부 코드 작성 순서</b>(9단계로 main.py·model.py·store.py를 직접 만든다) → <b style="color:#2f6feb">2부 실행 실습</b>(띄우고 호출해 본다). 코드를 먼저 이해하고 실행하세요.</div>
+  <p class="hint">점선 밑줄 용어에 마우스를 올리면 툴팁 설명이 나옵니다. 각 단계는 코드 → 수행결과 → 결과 설명 순서입니다.</p>
+
+  <section id="concept">
+    <h2>핵심 개념 — 왜 모델을 API로 만드나</h2>
+    <div class="note say"><span class="tag">설명</span>
+      <p>학습한 모델은 <code>model.pkl</code>이라는 <b>파일</b>일 뿐입니다. 다른 프로그램(웹·앱)이 쓰려면 <span class="tt" data-tip="HTTP로 요청하면 결과를 돌려주는 창구. 언어가 달라도 통신할 수 있다.">API</span>로 감싸야 합니다.</p>
+      <p>03에서 <b>Spring Boot(Java)</b>가 이 모델을 쓰는데, Java는 파이썬 pkl을 직접 못 읽습니다. 그래서 <span class="rule">파이썬이 API로 열어 주고, Java는 HTTP로 물어보는</span> 구조를 씁니다.</p></div>
+    <table><tr><th>구분</th><th>경로</th><th>차이</th></tr>
+    <tr><td>예측만</td><td><code>/predict</code></td><td>결과만 돌려주고 <b>저장 안 함</b>. 03의 BN이 쓰는 경로.</td></tr>
+    <tr><td>이력 CRUD</td><td><code>/predictions</code></td><td>예측 결과를 <span class="tt" data-tip="파일 하나로 동작하는 초경량 DB. 파이썬 표준 라이브러리라 설치가 필요 없다.">SQLite</span>에 <b>저장하고</b> 조회·수정·삭제.</td></tr></table>
+    <p class="lead"><span class="tt" data-tip="Create(생성)·Read(조회)·Update(수정)·Delete(삭제). 데이터를 다루는 4가지 기본 동작.">CRUD</span>는 웹 개발의 기본기입니다. 이 단원에서 ML 예측 결과를 대상으로 CRUD를 직접 만들어 봅니다.</p>
+  </section>
+
+  <section id="files">
+    <h2>파일 구성 — 무엇을 만들 것인가</h2>
+    <div class="note say"><span class="tag">설명</span><p><span class="rule">01을 먼저 끝내야 합니다.</span> <code>model.pkl</code>과 <code>feature_spec.json</code>은 01이 만들어 준 것이고, <b>나머지를 우리가 작성</b>합니다.</p></div>
+    <table><tr><th>파일</th><th>역할</th><th>누가 만드나</th></tr>
+    <tr><td><code>model.pkl</code></td><td>학습된 모델 (약 2.4MB)</td><td>01이 생성</td></tr>
+    <tr><td><code>feature_spec.json</code></td><td>입력 항목 정의</td><td>01이 생성</td></tr>
+    <tr><td><code>requirements.txt</code></td><td>설치할 패키지 목록</td><td><b>1단계</b></td></tr>
+    <tr><td><code>model.py</code></td><td>모델 로드 · 예측 함수</td><td><b>2단계</b></td></tr>
+    <tr><td><code>main.py</code></td><td>FastAPI 엔드포인트 8개</td><td><b>3~6, 8단계</b></td></tr>
+    <tr><td><code>store.py</code></td><td>예측 이력 저장소(SQLite CRUD)</td><td><b>7단계</b></td></tr>
+    <tr><td><code>Dockerfile</code></td><td>컨테이너 이미지 정의</td><td><b>9단계</b></td></tr>
+    <tr><td><code>predictions.db</code></td><td>이력 DB</td><td>실행하면 자동 생성</td></tr></table>
+    <div class="note exp"><span class="tag">작성 순서의 원칙</span>
+      <p><span class="rule">안쪽부터 바깥쪽으로</span> 만듭니다. <b>모델 다루기(model.py)</b> → <b>앱 뼈대(main.py)</b> → <b>예측 엔드포인트</b> → <b>저장소(store.py)</b> → <b>CRUD 엔드포인트</b> 순서입니다.</p>
+      <p>각 단계마다 <b>바로 실행해서 확인</b>할 수 있게 짰습니다. 한 번에 다 짜고 나서 오류를 찾으면 원인을 알기 어렵습니다.</p></div>
+  </section>
+
+  <h2 style="border-bottom:3px solid #2f6feb;padding-bottom:8px;margin-top:38px">1부. 코드 작성 순서</h2>
+
+  <section id="c1">
+    <h2><span class="n">1</span>requirements.txt — 무엇을 설치하나</h2>
+    <div class="note say"><span class="tag">설명</span><p>필요한 패키지를 <b>버전까지 고정</b>해 적는다. 버전을 안 적으면 나중에 다른 버전이 깔려 코드가 깨질 수 있다.</p></div>
+    <pre># 01(모델 학습) 환경과 같은 버전이어야 model.pkl 을 읽을 수 있다.
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+scikit-learn==1.9.0
+pandas==3.0.3
+numpy==2.4.6
+joblib==1.5.3</pre>
+    <div class="note exp"><span class="tag">왜 이것들인가</span>
+      <p><b>fastapi</b>·<b>uvicorn</b>: API 서버. <b>joblib</b>: pkl 읽기. <b>pandas</b>: 입력을 표로 변환. <b>scikit-learn</b>·<b>numpy</b>: <span class="tt" data-tip="pkl 안에는 RandomForest 객체가 들어 있다. 그 객체를 되살리려면 학습에 쓴 라이브러리가 같은 버전으로 있어야 한다.">모델을 되살리는 데 필요</span>.</p>
+      <p class="rule">중요: scikit-learn 버전이 01에서 학습할 때와 다르면 경고가 뜨거나 로드가 실패할 수 있다.</p>
+      <p><span class="tt" data-tip="SQLite는 파이썬 표준 라이브러리(sqlite3)라 설치가 필요 없다. 그래서 목록에 없다.">SQLite가 목록에 없는 이유</span>도 알아 두세요.</p></div>
+  </section>
+
+  <section id="c2">
+    <h2><span class="n">2</span>model.py — 모델 로드 · 예측 함수</h2>
+    <div class="note say"><span class="tag">설명</span><p>가장 <b>안쪽</b> 부품부터 만든다. API와 무관하게 <span class="rule">"pkl을 읽어 예측한다"는 일만</span> 담당한다.</p></div>
+    <pre>import joblib
+import pandas as pd
+
+
+def load_model(path="model.pkl"):
+    """학습된 모델 로드"""
+    return joblib.load(path)
+
+
+def predict(model, input_data):
+    """입력 dict -&gt; (예측 클래스, 확률 배열)"""
+    df = pd.DataFrame([input_data])
+    return model.predict(df)[0], model.predict_proba(df)[0]</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p><code>pd.DataFrame([input_data])</code>: 딕셔너리 하나를 <span class="tt" data-tip="{'월':3} 을 [{'월':3}] 로 감싸서 '1행짜리 표'를 만든다. 모델은 표(2차원)를 입력으로 받기 때문.">1행짜리 표</span>로 바꿉니다. 모델은 딕셔너리가 아니라 표를 받습니다.</p>
+      <p><code>[0]</code>: 1행만 넣었으니 결과도 1개. 배열에서 첫 번째를 꺼냅니다.</p>
+      <p><b>predict와 predict_proba를 둘 다</b> 돌려주는 이유: 화면에 <b>라벨</b>(있음/없음)과 <b>확률</b>을 함께 보여주기 위해서입니다.</p></div>
+    <div class="note warn"><span class="tag">주의 — 열 이름과 순서</span><p><code>input_data</code>의 <b>키 이름이 01에서 학습할 때의 열 이름과 같아야</b> 합니다(<code>gu</code> 등). 다르면 오류가 납니다.</p></div>
+  </section>
+
+  <section id="c3">
+    <h2><span class="n">3</span>main.py 뼈대 — 모델 로드 &amp; 앱 생성</h2>
+    <div class="note say"><span class="tag">설명</span><p>서버가 <b>뜰 때 딱 한 번</b> 모델과 spec을 읽어 메모리에 올려둔다. 요청마다 읽으면 매번 2.4MB를 로드해 느려진다.</p></div>
+    <pre>import json
+from typing import Dict, Any
+
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+import store
+from model import load_model, predict
+
+<span class="cmt"># 모델 · 입력 정의 로드 (startup 캐싱)</span>
+spec = json.load(open("feature_spec.json", encoding="utf-8"))
+model = load_model("model.pkl")
+LABELS = spec["target_labels"]
+
+app = FastAPI(title=spec["title"] + " ML API",
+              description="model.pkl 을 서빙하는 예측 엔드포인트 + 예측 이력 CRUD.")
+
+<span class="cmt"># React/BN 에서 호출 허용</span>
+app.add_middleware(CORSMiddleware, allow_origins=["*"],
+                   allow_methods=["*"], allow_headers=["*"])
+
+store.init_db()      <span class="cmt"># 예측 이력 테이블 준비 (7단계에서 만든다)</span></pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p><b>모듈 최상단에 두는 이유</b>: 파이썬은 이 파일을 <span class="tt" data-tip="import 될 때 위에서 아래로 한 번 실행된다. 그래서 서버 시작 시 1회만 로드된다.">한 번만 실행</span>합니다. 그래서 자연스럽게 "시작할 때 1회 로드"가 됩니다.</p>
+      <p><code>LABELS</code>: <code>["소형", "대형"]</code>. 모델은 0/1을 주는데 사람에게는 글자로 보여야 하니 <b>번호 → 글자 변환표</b>로 씁니다.</p>
+      <p><span class="tt" data-tip="Cross-Origin Resource Sharing. 브라우저는 다른 주소(포트)로의 요청을 기본적으로 막는다. 이걸 풀어주는 설정.">CORS</span>: 03에서 React(3000번)가 이 API(8003번)를 부를 수 있게 허용합니다. 없으면 브라우저가 요청을 차단합니다.</p>
+      <p class="rule">실습용이라 allow_origins=["*"](전부 허용). 실무에서는 허용할 주소를 명시해야 합니다.</p></div>
+  </section>
+
+  <section id="c4">
+    <h2><span class="n">4</span>요청 스키마 — 입력 형태 정하기</h2>
+    <div class="note say"><span class="tag">설명</span><p>어떤 JSON을 받을지 <span class="tt" data-tip="파이썬 타입 힌트로 데이터 형태를 정의하면 검증·문서화를 자동으로 해주는 라이브러리. FastAPI가 내부적으로 사용.">Pydantic</span> 클래스로 선언한다. <b>검증과 문서가 자동으로 따라온다.</b></p></div>
+    <pre>class PredictRequest(BaseModel):
+    features: Dict[str, Any]   <span class="cmt"># {"material":1, "usage":4, ...}</span></pre>
+    <div class="note exp"><span class="tag">이 3줄이 하는 일</span>
+      <p>1) <b>형태 강제</b>: 요청 본문이 반드시 <code>{"features": {...}}</code> 여야 합니다. 아니면 FastAPI가 <span class="tt" data-tip="Unprocessable Entity. 형식이 틀렸다는 뜻. 우리가 코드를 안 써도 자동으로 응답한다.">422 오류</span>를 자동으로 돌려줍니다.</p>
+      <p>2) <b>문서 자동 생성</b>: Swagger에 입력 예시가 나타납니다.</p>
+      <p><span class="rule">왜 features로 한 겹 감쌌나?</span> 나중에 <code>{"features": {...}, "memo": "..."}</code> 처럼 항목을 추가하기 쉽기 때문입니다. 03의 Spring Boot가 이 형태에 맞춰 감싸서 보냅니다.</p></div>
+  </section>
+
+  <section id="c5">
+    <h2><span class="n">5</span>첫 엔드포인트 — /health · /spec</h2>
+    <div class="note say"><span class="tag">설명</span><p>가장 간단한 것부터 만들어 <b>서버가 뜨는지 확인</b>한다.</p></div>
+    <pre>@app.get("/health")
+def health():
+    return {"status": "UP", "model": spec["title"]}
+
+
+@app.get("/spec")
+def get_spec():
+    """입력 항목 정의(라벨·범위·선택지) - FN 폼 자동 생성에 사용"""
+    return spec</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p><code>@app.get("/health")</code>: <span class="tt" data-tip="함수 위에 붙여 기능을 추가하는 문법. 여기서는 '이 함수를 GET /health 요청에 연결하라'는 뜻.">데코레이터</span>가 함수를 URL에 연결합니다. 이게 FastAPI의 핵심 문법입니다.</p>
+      <p>파이썬 <b>딕셔너리를 그냥 return</b>하면 FastAPI가 JSON으로 바꿔 줍니다. 변환 코드를 쓸 필요가 없습니다.</p>
+      <p><code>/health</code>는 <span class="tt" data-tip="서비스가 살아있는지 확인하는 표준 관행. 도커·쿠버네티스가 이 경로를 주기적으로 찔러 보고 죽었으면 재시작한다.">헬스체크</span> 관행입니다. <code>/spec</code>은 01이 만든 파일을 그대로 돌려주는데, <span class="rule">이 응답 하나가 03의 입력 폼을 자동으로 만듭니다.</span></p></div>
+    <div class="note do"><span class="tag">여기서 한 번 실행</span><p>지금까지만 짜고 <code>uvicorn main:app --port 8003</code>로 띄워 <code>/health</code>를 확인하세요. 되면 뼈대가 정상입니다. (단, 7단계 <code>store.py</code>가 아직 없으면 <code>import store</code>를 잠시 빼고 테스트)</p></div>
+  </section>
+
+  <section id="c6">
+    <h2><span class="n">6</span>예측 엔드포인트 — run_model() · /predict</h2>
+    <div class="note say"><span class="tag">설명</span><p>예측 로직을 <b>함수로 따로 뺀다</b>. <span class="rule">/predict 와 CRUD가 같은 로직을 써야 하기 때문</span>이다.</p></div>
+    <pre>def run_model(features: Dict[str, Any]) -&gt; Dict[str, Any]:
+    """model.pkl 로 예측해 결과 dict 를 만든다 (predict/CRUD 공용)"""
+    pred, proba = predict(model, features)
+    pred = int(pred)
+    return {
+        "prediction": pred,
+        "label": LABELS[pred],
+        "proba": {LABELS[0]: round(float(proba[0]), 4),
+                  LABELS[1]: round(float(proba[1]), 4)},
+    }
+
+
+@app.post("/predict")
+def do_predict(req: PredictRequest):
+    """예측만 한다 (저장 안 함). BN 이 사용하는 엔드포인트."""
+    return run_model(req.features)</pre>
+    <div class="note exp"><span class="tag">코드 설명 — 왜 run_model을 따로 뺐나</span>
+      <p><code>/predict</code>·<code>POST /predictions</code>·<code>PUT /predictions/{id}</code> <b>세 곳</b>이 예측을 합니다. 로직을 복사해 두면 나중에 한 곳만 고치고 나머지를 빠뜨리게 됩니다. <span class="rule">한 군데에만 두고 셋이 같이 씁니다.</span></p>
+      <p><code>int(pred)</code>·<code>float(proba[0])</code>: 모델이 주는 값은 <span class="tt" data-tip="numpy.int64 같은 타입. JSON으로 변환할 수 없어 오류가 난다. 파이썬 기본 타입으로 바꿔야 한다.">numpy 타입</span>이라 JSON으로 못 바꿉니다. 파이썬 기본 타입으로 변환해야 합니다. <b>실무에서 자주 만나는 오류</b>입니다.</p>
+      <p><code>LABELS[pred]</code>: 0 → "소형", 1 → "대형". 번호를 글자로 바꿔 줍니다.</p></div>
+  </section>
+
+  <section id="c7">
+    <h2><span class="n">7</span>store.py — 이력 저장소(SQLite CRUD)</h2>
+    <div class="note say"><span class="tag">설명</span><p>DB를 다루는 코드를 <b>별도 파일로</b> 분리한다. <code>main.py</code>는 "웹 요청 처리", <code>store.py</code>는 "저장" — <span class="tt" data-tip="한 파일은 한 가지 일만 하게 나누는 것. 나중에 SQLite를 MySQL로 바꿔도 main.py는 안 고쳐도 된다.">역할 분리</span>.</p></div>
+    <h3>7-1. 연결 &amp; 테이블 생성</h3>
+    <pre>import json
+import sqlite3
+from datetime import datetime
+
+DB_PATH = "predictions.db"
+
+
+def _con():
+    con = sqlite3.connect(DB_PATH)
+    con.row_factory = sqlite3.Row      <span class="cmt"># 결과를 dict 처럼 사용</span>
+    return con
+
+
+def init_db():
+    """예측 이력 테이블 생성 (앱 시작 시 1회)"""
+    con = _con()
+    try:
+        con.execute("""
+            CREATE TABLE IF NOT EXISTS predictions (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                features   TEXT NOT NULL,
+                prediction INTEGER NOT NULL,
+                label      TEXT NOT NULL,
+                proba      TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+        """)
+        con.commit()
+    finally:
+        con.close()</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p><code>IF NOT EXISTS</code>: 이미 있으면 그냥 넘어갑니다. 그래서 서버를 <b>몇 번 재시작해도 안전</b>합니다.</p>
+      <p><span class="tt" data-tip="값을 넣지 않으면 1, 2, 3... 자동으로 매겨진다. 예측 이력의 id가 여기서 나온다.">AUTOINCREMENT</span>: id를 자동으로 매깁니다.</p>
+      <p><code>features</code>·<code>proba</code>가 <b>TEXT</b>인 이유: 딕셔너리를 <span class="tt" data-tip="SQLite에는 딕셔너리 타입이 없다. json.dumps로 문자열로 바꿔 저장하고, 꺼낼 때 json.loads로 되돌린다.">JSON 문자열로 바꿔</span> 저장하기 때문입니다.</p>
+      <p><code>try/finally</code>로 <b>반드시 close()</b>합니다. 안 닫으면 연결이 쌓입니다.</p></div>
+
+    <h3>7-2. CRUD 함수 4종</h3>
+    <pre><span class="cmt"># C : 저장하고 저장된 레코드를 돌려준다</span>
+def create(features, result):
+    con = _con()
+    try:
+        cur = con.execute(
+            "INSERT INTO predictions(features, prediction, label, proba, created_at)"
+            " VALUES (?, ?, ?, ?, ?)",
+            (json.dumps(features, ensure_ascii=False), result["prediction"], result["label"],
+             json.dumps(result["proba"], ensure_ascii=False),
+             datetime.now().isoformat(timespec="seconds")),
+        )
+        con.commit()
+        pid = cur.lastrowid
+    finally:
+        con.close()
+    return get(pid)
+
+
+<span class="cmt"># R : 단건 (없으면 None) / 목록 (최신순)</span>
+def get(pid): ...
+def list_all(limit=50): ...        <span class="cmt"># ORDER BY id DESC LIMIT ?</span>
+
+<span class="cmt"># U : 다시 예측한 결과로 갱신 (없으면 None)</span>
+def update(pid, features, result): ...
+
+<span class="cmt"># D : 삭제 (지운 게 있으면 True)</span>
+def delete(pid): ...</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p><code>?</code> 자리표시자: 값을 직접 문자열로 붙이지 않고 <b>따로 전달</b>합니다. <span class="tt" data-tip="입력값에 SQL 명령을 섞어 DB를 조작하는 공격. 자리표시자를 쓰면 값이 값으로만 취급되어 막힌다.">SQL 인젝션</span>을 막는 기본기입니다.</p>
+      <p><code>ensure_ascii=False</code>: 한글이 <code>\uc778\uba85</code> 처럼 깨져 저장되지 않게 합니다.</p>
+      <p><code>create</code>가 마지막에 <code>get(pid)</code>를 부르는 이유: <b>DB가 매긴 id와 저장된 실제 값</b>을 그대로 돌려주기 위해서입니다.</p>
+      <p><code>update</code>·<code>delete</code>는 <span class="tt" data-tip="영향받은 행의 수. 0이면 그 id가 없었다는 뜻이라 404를 낼 근거가 된다.">rowcount</span>로 "그 id가 있었는지"를 판단합니다. 이게 8단계 404 처리의 근거입니다.</p></div>
+  </section>
+
+  <section id="c8">
+    <h2><span class="n">8</span>CRUD 엔드포인트 — main.py에 5개 추가</h2>
+    <div class="note say"><span class="tag">설명</span><p>7단계에서 만든 <code>store</code> 함수를 URL에 연결한다. <b>엔드포인트는 얇게</b> — 실제 일은 store와 run_model이 한다.</p></div>
+    <pre>@app.post("/predictions", status_code=201)
+def create_prediction(req: PredictRequest):
+    """C : 예측 후 이력에 저장"""
+    return store.create(req.features, run_model(req.features))
+
+
+@app.get("/predictions")
+def list_predictions(limit: int = 50):
+    """R : 이력 목록 (최신순)"""
+    return store.list_all(limit)
+
+
+@app.get("/predictions/{pid}")
+def get_prediction(pid: int):
+    """R : 이력 단건"""
+    row = store.get(pid)
+    if row is None:
+        raise HTTPException(status_code=404, detail="해당 예측 이력이 없습니다")
+    return row
+
+
+@app.put("/predictions/{pid}")
+def update_prediction(pid: int, req: PredictRequest):
+    """U : 입력을 바꿔 다시 예측하고 이력을 갱신"""
+    row = store.update(pid, req.features, run_model(req.features))
+    if row is None:
+        raise HTTPException(status_code=404, detail="해당 예측 이력이 없습니다")
+    return row
+
+
+@app.delete("/predictions/{pid}")
+def delete_prediction(pid: int):
+    """D : 이력 삭제"""
+    if not store.delete(pid):
+        raise HTTPException(status_code=404, detail="해당 예측 이력이 없습니다")
+    return {"deleted": pid}</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p><code>status_code=201</code>: 생성은 200이 아니라 <span class="tt" data-tip="Created. 새 자원을 만들었을 때 쓰는 상태코드. REST 규약.">201</span>을 쓰는 게 REST 관행입니다.</p>
+      <p><code>{pid}</code> + <code>pid: int</code>: URL의 <span class="tt" data-tip="경로에 들어있는 값. /predictions/1 의 1이 pid로 들어온다. int로 선언하면 문자를 넣었을 때 FastAPI가 자동으로 422를 낸다.">경로 변수</span>를 함수 인자로 받습니다. 타입을 <code>int</code>로 적으면 검증까지 자동입니다.</p>
+      <p><code>limit: int = 50</code>: <span class="tt" data-tip="?limit=10 처럼 URL 뒤에 붙는 값. 기본값을 주면 생략 가능하다.">쿼리 파라미터</span>. 안 보내면 50.</p>
+      <p><code>raise HTTPException(404)</code>: <b>PUT에서도 U 하기 전에</b> 없으면 404입니다. store가 <code>None</code>을 주는 걸 그대로 404로 옮깁니다.</p>
+      <p class="rule">U가 단순 덮어쓰기가 아닌 것에 주목: run_model(req.features)를 다시 호출해 새 입력으로 재예측한 뒤 갱신합니다.</p></div>
+  </section>
+
+  <section id="c9">
+    <h2><span class="n">9</span>Dockerfile — 컨테이너로 포장</h2>
+    <div class="note say"><span class="tag">설명</span><p>03에서 이 이미지를 <b>그대로 재사용</b>한다.</p></div>
+    <pre>FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8003
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8003"]</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p><b>requirements.txt를 먼저 COPY</b>하고 설치한 뒤 <code>COPY . .</code>를 하는 이유: 코드만 바뀌면 <span class="tt" data-tip="도커는 각 줄의 결과를 캐시한다. requirements가 안 바뀌면 pip install을 건너뛰어 빌드가 빨라진다.">설치 단계를 건너뛰어</span> 빌드가 빨라집니다.</p>
+      <p><code>COPY . .</code>가 <b><code>model.pkl</code>·<code>store.py</code>까지 통째로</b> 넣습니다. 그래서 <span class="rule">01을 먼저 돌려야</span> 의미 있는 이미지가 됩니다.</p>
+      <p><code>--host 0.0.0.0</code>: 컨테이너 <b>밖에서</b> 접속하려면 필수입니다. 기본값(127.0.0.1)이면 컨테이너 안에서만 접근됩니다. <b>자주 하는 실수</b>입니다.</p></div>
+  </section>
+
+  <h2 style="border-bottom:3px solid #2f6feb;padding-bottom:8px;margin-top:38px">2부. 실행 실습</h2>
+
+  <section id="r1">
+    <h2><span class="n">1</span>패키지 설치 &amp; 서버 실행</h2>
+    <div class="note say"><span class="tag">설명</span><p><span class="tt" data-tip="FastAPI 앱을 실제로 돌려주는 웹 서버. main.py의 app 객체를 실행한다.">uvicorn</span>으로 서버를 띄운다.</p></div>
+    <pre>pip install -r requirements.txt
+uvicorn main:app --host 0.0.0.0 --port 8003</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>INFO:     Started server process
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8003 (Press CTRL+C to quit)</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p>"Application startup complete"가 보이면 성공. 이때 3단계의 <code>load_model</code>·<code>json.load</code>가 실행되고, <code>store.init_db()</code>가 <code>predictions.db</code>를 만듭니다.</p>
+      <p><b>FileNotFoundError</b>가 나면 01을 안 돌린 것입니다. <code>main:app</code>은 "main.py의 app 객체"라는 뜻입니다.</p></div>
+  </section>
+
+  <section id="r2">
+    <h2><span class="n">2</span>Swagger 문서 열기</h2>
+    <div class="note say"><span class="tag">설명</span><p>FastAPI가 <span class="tt" data-tip="코드에서 자동으로 만들어지는 API 문서. 브라우저에서 직접 호출해 볼 수 있다.">Swagger UI</span>를 자동 생성한다. <b>터미널이 어려우면 이 화면만 써도 된다.</b></p></div>
+    <pre>브라우저에서 열기:  http://localhost:8003/docs</pre>
+    <div class="note exp"><span class="tag">결과 설명</span><p>1부에서 만든 엔드포인트 8개가 목록으로 보입니다. <b>Try it out</b> → 값 입력 → <b>Execute</b>로 실행됩니다. <span class="rule">이 문서를 우리가 따로 만들지 않았다는 점</span>에 주목하세요 — 4단계의 <code>PredictRequest</code>와 데코레이터에서 자동 생성된 것입니다.</p></div>
+  </section>
+
+  <section id="r3">
+    <h2><span class="n">3</span>상태 · 입력 정의 확인</h2>
+    <pre>curl http://localhost:8003/health</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>{
+  "status": "UP",
+  "model": "어선 규모(대형) 예측"
+}</pre></div>
+    <pre>curl http://localhost:8003/spec</pre>
+    <div class="out"><div class="olabel">수행결과 (일부만 표시)</div><pre>{
+  "title": "어선 규모(대형) 예측",
+  "target_labels": ["소형", "대형"],
+  "accuracy": 0.6428,
+  "roc_auc": 0.7153,
+  "features": [
+    {
+      "name": "material",
+      "label": "선질(재질)",
+      "kind": "cat",
+      "options": ["FRP", "강", "기타", <span class="trunc">... 총 5개</span>]
+    },
+    <span class="trunc">... (용도 21 · 세부용도 21 · 선적항 19)</span>
+  ]
+}</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p>5단계에서 <code>return spec</code> 한 줄이 이 응답을 만든 것입니다.</p>
+      <p><span class="tt" data-tip="options 배열의 순서가 곧 코드 번호. 강남구=0, 강동구=1 ... 01의 학습 순서와 동일해야 한다.">options 배열의 순서 = 코드 번호</span>입니다. 예측 요청 때 <b>이름이 아니라 이 번호</b>를 보냅니다.</p></div>
+  </section>
+
+  <section id="r4">
+    <h2><span class="n">4</span>예측하기 — <code>/predict</code></h2>
+    <h3>4-1. 위험이 높은 상황 — 강철 근해통발어업 어선</h3>
+    <pre>curl -X POST http://localhost:8003/predict \
+  -H "Content-Type: application/json" \
+  -d '{"features":{"material":1,"usage":4,"usage_sub":5,"port":3}}'</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>{
+  "prediction": 1,
+  "label": "대형",
+  "proba": {
+    "소형": 0.0,
+    "대형": 1.0
+  }
+}</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p>강(1) · <b>근해통발어업</b>(4) · 경남(3). 대형 확률 <b>100%</b>. 근해어업은 예외 없이 대형이고 강철선도 100% 대형이라 모델이 확신하는 조합입니다 — 6단계 <code>run_model</code>이 만든 딕셔너리가 그대로 JSON이 된 것입니다.</p></div>
+
+    <h3>4-2. 반대 상황 — FRP 마을어업 어선</h3>
+    <pre>curl -X POST http://localhost:8003/predict \
+  -H "Content-Type: application/json" \
+  -d '{"features":{"material":0,"usage":7,"usage_sub":7,"port":12}}'</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>{
+  "prediction": 0,
+  "label": "소형",
+  "proba": {
+    "소형": 0.9661,
+    "대형": 0.0339
+  }
+}</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p>같은 모델이 <b>완전히 다른 답</b>(96.6% 없음)을 냅니다. <span class="rule">두 요청을 반드시 모두 해보세요.</span></p></div>
+    <div class="note warn"><span class="tag">자주 하는 실수</span><p>선택 항목은 <b>이름이 아니라 번호</b>입니다. <code>"material": "강"</code>는 422 오류 — 4단계 <code>PredictRequest</code>가 걸러 냅니다.</p></div>
+  </section>
+
+  <section id="r5">
+    <h2><span class="n">5</span>C — 예측하고 저장 <code>POST /predictions</code></h2>
+    <pre>curl -X POST http://localhost:8003/predictions \
+  -H "Content-Type: application/json" \
+  -d '{"features":{"material":1,"usage":4,"usage_sub":5,"port":3}}'</pre>
+    <div class="out"><div class="olabel">수행결과 (상태코드 201)</div><pre>{
+  "id": 1,
+  "features": {
+    "material": 1, "usage": 4, "usage_sub": 5, "port": 3
+  },
+  "prediction": 1,
+  "label": "대형",
+  "proba": { "소형": 0.0, "대형": 1.0 },
+  "created_at": "2026-07-15T09:43:58"
+}</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p><code>/predict</code>와 달리 <b><code>id</code>와 <code>created_at</code>이 붙어</b> 돌아옵니다 — 7단계 <code>create()</code>가 마지막에 <code>get(pid)</code>로 저장된 값을 다시 읽어 준 결과입니다.</p>
+      <p class="rule">이 id를 기억하세요. 6~8단계에서 씁니다. 값을 바꿔 2~3건 더 저장해 두면 목록 조회가 잘 보입니다.</p></div>
+  </section>
+
+  <section id="r6">
+    <h2><span class="n">6</span>R — 조회 <code>GET /predictions</code></h2>
+    <pre>curl http://localhost:8003/predictions           <span class="cmt"># 목록 (최신순)</span>
+curl http://localhost:8003/predictions?limit=10  <span class="cmt"># 개수 제한</span>
+curl http://localhost:8003/predictions/1         <span class="cmt"># 단건</span></pre>
+    <div class="out"><div class="olabel">수행결과 (목록 — 일부 필드만 표시)</div><pre>[
+  { "id": 2, "label": "소형", "created_at": "2026-07-15T09:43:58" },
+  { "id": 1, "label": "대형", "created_at": "2026-07-15T09:43:58" }
+]</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p><b>id 2가 먼저</b> 나옵니다 — 7단계 <code>list_all</code>의 <code>ORDER BY id DESC</code> 때문. <code>?limit=10</code>은 8단계의 <code>limit: int = 50</code>에 들어갑니다.</p></div>
+  </section>
+
+  <section id="r7">
+    <h2><span class="n">7</span>U — 수정 <code>PUT /predictions/1</code></h2>
+    <div class="note say"><span class="tag">설명</span><p>1번(고위험)을 저위험 입력으로 바꿔 본다. <span class="rule">값만 바뀌는 게 아니라 다시 예측된다.</span></p></div>
+    <pre>curl -X PUT http://localhost:8003/predictions/1 \
+  -H "Content-Type: application/json" \
+  -d '{"features":{"material":0,"usage":7,"usage_sub":7,"port":12}}'</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>{
+  "id": 1,
+  "features": {
+    "material": 0, "usage": 7, "usage_sub": 7, "port": 12
+  },
+  "prediction": 0,
+  "label": "소형",
+  "proba": { "소형": 0.9661, "대형": 0.0339 },
+  "created_at": "2026-07-15T09:43:58"
+}</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p><code>id</code>는 1 그대로, <code>label</code>이 <b>"있음" → "없음"으로 뒤집혔습니다.</b> 8단계 <code>update_prediction</code>이 <code>run_model(req.features)</code>를 <b>다시 호출</b>했기 때문입니다.</p>
+      <p><code>created_at</code>은 <b>처음 만든 시각 그대로</b>입니다 — 7단계 <code>update</code>의 UPDATE 문에 <code>created_at</code>이 없기 때문.</p></div>
+  </section>
+
+  <section id="r8">
+    <h2><span class="n">8</span>D — 삭제 <code>DELETE /predictions/1</code></h2>
+    <pre>curl -X DELETE http://localhost:8003/predictions/1</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>{
+  "deleted": 1
+}</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p>지운 id를 알려줍니다. <code>GET /predictions</code>를 다시 하면 <b>1번이 사라져</b> 있습니다.</p></div>
+  </section>
+
+  <section id="r9">
+    <h2><span class="n">9</span>오류 처리 — 없는 번호로 404 확인</h2>
+    <div class="note say"><span class="tag">설명</span><p>방금 지운 번호로 요청해 본다. <b>오류 처리도 API의 일부</b>다.</p></div>
+    <pre>curl -i http://localhost:8003/predictions/9999</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>HTTP/1.1 404 Not Found
+content-type: application/json
+
+{
+  "detail": "해당 예측 이력이 없습니다"
+}</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p>서버가 죽지 않고 <span class="tt" data-tip="Not Found. 요청한 자원이 없다는 뜻의 표준 상태코드.">404</span>와 이유를 돌려줍니다. 8단계의 <code>raise HTTPException(status_code=404, ...)</code>가 만든 응답입니다.</p>
+      <p>GET·PUT·DELETE 모두 404입니다. 03에서 Spring Boot도 이 404를 <b>그대로 전달</b>합니다.</p></div>
+  </section>
+
+  <section id="r10">
+    <h2><span class="n">10</span>도커로 실행하기</h2>
+    <pre>docker compose up --build
+<span class="cmt"># → http://localhost:8003/docs</span></pre>
+    <div class="note exp"><span class="tag">결과 설명</span><p>9단계 Dockerfile이 동작합니다. 03에서는 이 이미지가 <b>그대로 재사용</b>됩니다.</p></div>
+    <div class="note warn"><span class="tag">주의</span><p>이력은 <code>predictions.db</code>에 쌓입니다. 도커로 실행하면 <b>컨테이너 안에</b> 저장되므로 <code>docker compose down</code> 하면 사라집니다.</p></div>
+  </section>
+
+  <section id="wrap">
+    <h2>마무리 &amp; 다음</h2>
+    <h3>코드 작성 순서 요약</h3>
+    <div class="flow">requirements → <b>model.py</b>(모델 다루기) → <b>main.py 뼈대</b>(로드·앱·CORS) → 스키마 → /health·/spec → <b>run_model + /predict</b> → <b>store.py</b>(DB) → CRUD 엔드포인트 → Dockerfile</div>
+    <ul>
+      <li><b>안쪽부터 바깥쪽으로</b>: 모델 다루기 → 앱 뼈대 → 엔드포인트. 단계마다 실행해 확인.</li>
+      <li><b>역할 분리</b>: <code>model.py</code>(예측) · <code>store.py</code>(저장) · <code>main.py</code>(웹). 엔드포인트는 얇게.</li>
+      <li><b>중복 제거</b>: 예측 로직은 <code>run_model()</code> 한 곳에만. 세 엔드포인트가 공용.</li>
+      <li><code>/predict</code>(저장 안 함)와 <code>/predictions</code>(CRUD)의 <b>차이</b>를 구분할 것.</li>
+      <li><code>feature_spec.json</code> 하나가 <b>API 문서·입력 검증·03의 폼</b>을 모두 만들어 낸다.</li>
+    </ul>
+    <h3>자주 막히는 곳</h3>
+    <table><tr><th>증상</th><th>원인 · 해결</th></tr>
+    <tr><td>FileNotFoundError로 서버가 안 뜸</td><td>3단계가 <code>model.pkl</code>을 못 찾음 → <b>01을 먼저 실행</b></td></tr>
+    <tr><td>Object of type int64 is not JSON serializable</td><td>6단계의 <code>int()</code>·<code>float()</code> 변환을 빠뜨림</td></tr>
+    <tr><td>422 Unprocessable Entity</td><td>본문이 <code>{"features": {...}}</code>가 아니거나 선택값을 글자로 보냄</td></tr>
+    <tr><td>브라우저에서 CORS 오류</td><td>3단계 <code>add_middleware(CORSMiddleware...)</code> 확인</td></tr>
+    <tr><td>도커에서 접속이 안 됨</td><td>9단계 <code>--host 0.0.0.0</code> 확인(127.0.0.1이면 컨테이너 밖에서 접근 불가)</td></tr>
+    <tr><td>저장된 한글이 \uc778... 로 깨짐</td><td>7단계 <code>ensure_ascii=False</code> 확인</td></tr>
+    <tr><td>항상 "소형"만 나옴</td><td>저위험 조합이다. 4-1의 고위험 값으로 확인</td></tr>
+    <tr><td>포트 8003 사용 중</td><td>다른 SAMPLE의 02/03이 떠 있는지 확인 → <code>docker compose down</code></td></tr></table>
+    <p class="lead">다음: <b>03. 풀스택</b> — React + Spring Boot + 이 ML API + MySQL + Redis를 한 번에 띄우고, 로그인 후 화면에서 예측합니다.</p>
+  </section>
+
+  <footer>빅데이터 분석 모델링 · SAMPLE_3 / 02 ML API 상세가이드 · 코드: main.py · model.py · store.py</footer>
+</div>
+</div>
+<script>
+(function(){var L=[].slice.call(document.querySelectorAll('.side a[href^="#"]'));var M={};L.forEach(function(a){var s=document.getElementById(a.getAttribute('href').slice(1));if(s)M[a.getAttribute('href').slice(1)]=a;});var ids=Object.keys(M);function f(){var cur=null;ids.forEach(function(id){if(document.getElementById(id).getBoundingClientRect().top<=120)cur=id;});L.forEach(function(a){a.classList.remove('act');});if(cur)M[cur].classList.add('act');}document.addEventListener('scroll',f,{passive:true});window.addEventListener('load',f);f();})();
+</script>
+</body>
+</html>

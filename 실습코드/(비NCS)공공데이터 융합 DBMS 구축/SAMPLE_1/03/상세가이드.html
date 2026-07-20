@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMPLE_1 / 03 풀스택 - 상세가이드</title>
+<style>
+  :root{ --ink:#222; --muted:#777; --line:#eaeaea; --accent:#2f6feb; --do:#1a9e6a; --code:#f5f6f8; --out:#f2f8f4; --out-b:#cfe6d8; --warn:#d9822b; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic",sans-serif;line-height:1.75;font-size:16px}
+  .wrap{max-width:840px;margin:0 auto;padding:44px 22px 90px}
+  .kicker{color:var(--accent);font-weight:600;font-size:13px}
+  h1{margin:8px 0 6px;font-size:26px;font-weight:700}.sub{color:var(--muted);margin:0 0 12px}.meta{color:var(--muted);font-size:14px;margin:0 0 4px}
+  .flow{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px 15px;margin:14px 0;font-size:14px;color:#444}.flow b{color:var(--accent)}
+  .hint{font-size:13px;color:var(--muted);margin:8px 0 0}
+  section{padding:26px 0;border-bottom:1px solid var(--line)}section:last-of-type{border-bottom:none}
+  h2{margin:0 0 4px;font-size:19px;font-weight:700}h2 .n{color:var(--accent);margin-right:8px}h3{margin:18px 0 4px;font-size:16px}
+  .lead{color:var(--muted);margin:2px 0 10px}
+  .note{margin:12px 0;padding-left:14px;border-left:3px solid var(--line)}.note .tag{font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase}
+  .note.do{border-left-color:var(--do)}.note.do .tag{color:var(--do)}.note.say{border-left-color:var(--accent)}.note.say .tag{color:var(--accent)}
+  .note.exp{border-left-color:var(--do);background:#fbfefc}.note.exp .tag{color:var(--do)}.note p{margin:3px 0}
+  .note.warn{border-left-color:var(--warn);background:#fffdf7}.note.warn .tag{color:var(--warn)}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:13px 15px;overflow:auto;font-family:Consolas,"D2Coding",monospace;font-size:13.5px;line-height:1.6;margin:12px 0;color:#1b1f24}pre .cmt{color:#9aa0a6}
+  .out{margin:10px 0}
+  .out .olabel{font-size:12px;font-weight:700;color:var(--do);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px}
+  .out pre{background:var(--out);border:1px solid var(--out-b);color:#123}
+  .out pre .trunc{color:#9aa0a6}
+  .out.pred .olabel{color:var(--warn)}
+  .out.pred pre{background:#fffdf7;border-color:#f0dcc0}
+  code{background:#f0f1f3;border-radius:5px;padding:1px 6px;font-family:Consolas,monospace;font-size:14px}
+  ul,ol{margin:8px 0;padding-left:20px}li{margin:3px 0}.rule{font-weight:700;color:var(--accent)}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}th,td{border:1px solid var(--line);padding:7px 10px;text-align:left}th{background:#fafbfc}
+  .tt{border-bottom:1px dotted var(--accent);cursor:help;position:relative}
+  .tt:hover::after{content:attr(data-tip);position:absolute;left:0;bottom:135%;background:#222;color:#fff;padding:7px 10px;border-radius:6px;font-size:12.5px;font-weight:400;line-height:1.55;white-space:normal;width:max-content;max-width:280px;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  .tt:hover::before{content:'';position:absolute;left:12px;bottom:120%;border:6px solid transparent;border-top-color:#222;z-index:20}
+  footer{color:var(--muted);font-size:13px;margin-top:32px}
+  .layout{display:flex;align-items:flex-start;max-width:1180px;margin:0 auto}
+  .side{position:sticky;top:0;align-self:flex-start;flex:0 0 190px;max-height:100vh;overflow-y:auto;padding:44px 14px 40px;border-right:1px solid var(--line);font-size:13.5px}
+  .side-title{font-weight:700;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;padding-left:8px}
+  .side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .side a:hover{background:var(--code);color:var(--accent)}
+  .side a.act{color:var(--accent);font-weight:600;background:var(--code)}
+  .layout .wrap{margin:0 auto}
+  .src{font-size:13px;color:var(--muted);margin:8px 0 0}.src a{color:var(--accent);text-decoration:none;border-bottom:1px solid #cfe0ff}.src a:hover{border-bottom-color:var(--accent)}
+  .ds{margin:14px 0;border:1px solid var(--line);border-radius:8px;background:#fcfdff}
+  .ds>summary{cursor:pointer;padding:11px 15px;font-weight:700;font-size:14px;color:var(--accent);list-style:none}
+  .ds>summary::-webkit-details-marker{display:none}
+  .ds>summary::before{content:"\25B8  "}
+  .ds[open]>summary::before{content:"\25BE  "}
+  .ds .dsbody{padding:2px 15px 14px}
+  .ds h4{margin:15px 0 4px;font-size:14px;color:var(--ink);border-left:3px solid var(--accent);padding-left:8px}
+  .ds p{margin:4px 0;font-size:14px}
+  .ds table{margin:6px 0;font-size:13.5px}
+  .ds .approach{padding-left:2px;margin:5px 0}
+  .ds .tag2{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:10px;background:var(--code);color:var(--accent);margin-right:6px}
+  @media (max-width:760px){.layout{flex-direction:column}.side{position:static;flex:none;width:100%;max-height:none;border-right:none;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:2px;padding:14px}.side-title{width:100%}}
+  @media print{.side{display:none}.layout{display:block}section{page-break-inside:avoid}.tt{border:none}}
+</style>
+</head>
+<body>
+<div class="layout"><nav class="side"><div class="side-title">목차</div><a href="#concept">개념·구조</a><a href="#base">템플릿 구성</a><div style="font-size:11px;color:#9aa0a6;font-weight:700;margin:10px 0 3px;padding-left:9px">코드 작성 순서</div><a href="#c0">0. 템플릿 가져오기</a><a href="#c1">1. compose: ml 추가</a><a href="#c2">2. compose: BN 연결</a><a href="#c3">3. BN 컨트롤러</a><a href="#c4">4. FN 예측 화면</a><a href="#c5">5. FN 라우팅</a><div style="font-size:11px;color:#9aa0a6;font-weight:700;margin:10px 0 3px;padding-left:9px">실행 실습</div><a href="#r1">1. 사전 확인</a><a href="#r2">2. 전체 기동</a><a href="#r3">3. 상태 확인</a><a href="#r4">4. 접속·가입</a><a href="#r5">5. 로그인</a><a href="#r6">6. 예측 폼</a><a href="#r7">7. C 예측·저장</a><a href="#r8">8. R 이력</a><a href="#r9">9. U 수정</a><a href="#r10">10. D 삭제</a><a href="#r11">11. 종료</a><div style="font-size:11px;color:#9aa0a6;font-weight:700;margin:10px 0 3px;padding-left:9px">참고</div><a href="#api">BN API 표</a><a href="#wrap">마무리</a></nav>
+  <div class="wrap">
+  <div class="kicker">실습 상세가이드 · 빅데이터 분석 모델링 · SAMPLE_1 / 03</div>
+  <h1>03. 풀스택 — 로그인하고 화면에서 예측하기</h1>
+  <p class="sub">인증이 완성된 풀스택 템플릿에 ML을 연결한다. 무엇을 추가·수정하는지 순서대로 짚은 뒤 실행한다.</p>
+  <p class="meta">대상: 비전공 초보 · 소요: 약 3시간 · 선수: 01·02 완료 · 필요: Docker Desktop 실행 중</p>
+  <div class="flow"><b>이 문서는 두 부분입니다</b> — <b style="color:#2f6feb">1부 코드 작성 순서</b>(템플릿에 무엇을 추가·수정하는가, 5단계) → <b style="color:#2f6feb">2부 실행 실습</b>(띄우고 화면에서 예측). <b>이미 있는 인증 코드는 건드리지 않습니다.</b></div>
+  <p class="hint">점선 밑줄 용어에 마우스를 올리면 툴팁 설명이 나옵니다. 각 단계는 코드 → 수행결과 → 결과 설명 순서입니다.</p>
+  <div class="note warn"><span class="tag">이 문서의 결과 표기</span><p>초록색 <b>수행결과</b>는 실제로 확인된 출력입니다. 주황색 <b>예상 출력</b>은 도커 환경·시각·컨테이너 ID에 따라 달라지는 부분이라 <b>형태만</b> 보여 준 것이니, 글자가 완전히 같지 않아도 정상입니다.</p></div>
+
+  <section id="concept">
+    <h2>핵심 개념 — 왜 서비스를 나누나</h2>
+    <div class="note say"><span class="tag">설명</span>
+      <p>한 덩어리로 만들면 편할 텐데 왜 나눌까요? <b>각자 잘하는 게 다르기 때문</b>입니다.</p></div>
+    <table><tr><th>서비스</th><th>기술</th><th>맡은 일</th><th>포트</th></tr>
+    <tr><td><b>FN</b></td><td>React + nginx</td><td>화면 · 입력 폼 · 이력 표</td><td>3000</td></tr>
+    <tr><td><b>BN</b></td><td>Spring Boot (Java)</td><td><span class="tt" data-tip="로그인 여부를 확인하고 토큰을 발급·검증하는 일. 보안이 중요해 검증된 프레임워크를 쓴다.">인증</span> + 예측 <span class="tt" data-tip="자기가 처리하지 않고 다른 서버에 요청을 넘겨주고 결과를 그대로 전달하는 것. 프록시.">중계</span></td><td>8080</td></tr>
+    <tr><td><b>ML</b></td><td>FastAPI (Python) = 02</td><td>model.pkl 추론 + 이력 저장</td><td>8001</td></tr>
+    <tr><td><b>DB</b></td><td>MySQL</td><td>회원 정보</td><td>3330</td></tr>
+    <tr><td><b>Redis</b></td><td>Redis</td><td><span class="tt" data-tip="메모리에 저장하는 초고속 저장소. 토큰처럼 자주 확인하고 유효기간이 있는 데이터에 적합.">토큰 저장</span></td><td>6380</td></tr></table>
+    <div class="note exp"><span class="tag">핵심</span>
+      <p><b>Java는 파이썬 pkl을 읽지 못합니다.</b> 그래서 머신러닝은 파이썬(ML)이 맡고, 로그인·회원관리는 Java(BN)가 맡고, 둘은 <b>HTTP로 대화</b>합니다.</p>
+      <p class="rule">데이터 흐름: 브라우저(FN) → BN(인증 확인 후 중계) → ML(추론) → model.pkl</p>
+      <p>실무의 <span class="tt" data-tip="기능별로 서비스를 나눠 독립적으로 개발·배포하는 구조. 이 실습이 그 축소판이다.">마이크로서비스</span> 구조를 5개 컨테이너로 축소해 놓은 것이 이 실습입니다.</p></div>
+  </section>
+
+  <section id="base">
+    <h2>템플릿 구성 — 무엇이 이미 있고, 무엇을 만드나</h2>
+    <div class="note say"><span class="tag">설명</span><p>이 폴더는 <code>03_DOCKER_COMPOSE</code> 템플릿을 <b>그대로 가져온 것</b>이다. 회원가입·로그인·JWT·Redis는 <span class="rule">이미 완성되어 있다</span>. 우리는 <b>ML 연결만</b> 얹는다.</p></div>
+    <table><tr><th>구분</th><th>파일</th><th>상태</th></tr>
+    <tr><td rowspan="2">이미 있음<br>(건드리지 않음)</td><td>BN: SecurityConfig · User CRUD · JWT · Redis</td><td>템플릿 그대로</td></tr>
+    <tr><td>FN: Main · Join · Login · Logout · User · axiosConfig</td><td>템플릿 그대로</td></tr>
+    <tr><td rowspan="2"><b>새로 만듦</b></td><td><code>BN/.../Controller/PredictionController.java</code></td><td><b>3단계</b></td></tr>
+    <tr><td><code>FN/src/components/Predict.jsx</code></td><td><b>4단계</b></td></tr>
+    <tr><td rowspan="2"><b>고침</b></td><td><code>docker-compose.yml</code></td><td><b>1·2단계</b></td></tr>
+    <tr><td><code>FN/src/App.js</code></td><td><b>5단계</b> (3줄만)</td></tr></table>
+    <div class="note exp"><span class="tag">작업량</span>
+      <p>템플릿 대비 <b>바뀌는 곳은 딱 4개 파일</b>입니다. 신규 2개, 수정 2개. 인증 코드는 한 줄도 손대지 않습니다.</p>
+      <p><span class="rule">순서의 원칙: 바깥(인프라) → 안(코드).</span> 먼저 compose에 ML을 띄우고(1·2단계), 그다음 BN이 부르게 하고(3단계), 마지막에 화면을 만듭니다(4·5단계). 각 단계마다 확인할 수 있습니다.</p></div>
+  </section>
+
+  <h2 style="border-bottom:3px solid #2f6feb;padding-bottom:8px;margin-top:38px">1부. 코드 작성 순서</h2>
+
+  <section id="c0">
+    <h2><span class="n">0</span>템플릿 가져오기</h2>
+    <div class="note say"><span class="tag">설명</span><p>인증이 완성된 풀스택 템플릿을 복사해 온다. (이 폴더에는 <b>이미 복사되어 있다</b> — 구조만 확인하고 넘어가면 된다.)</p></div>
+    <pre>03/
+ ├─ BN/        <span class="cmt"># Spring Boot : 회원가입·로그인·JWT·Redis (완성됨)</span>
+ ├─ FN/        <span class="cmt"># React : 화면 (완성됨)</span>
+ ├─ DB/        <span class="cmt"># MySQL</span>
+ ├─ REDIS/     <span class="cmt"># Redis</span>
+ └─ docker-compose.yml</pre>
+    <div class="note exp"><span class="tag">결과 설명</span><p>이 상태로도 <code>docker compose up</code>이 됩니다. 회원가입·로그인까지 동작하지만 <b>예측 기능이 없습니다.</b> 그걸 지금부터 붙입니다.</p></div>
+  </section>
+
+  <section id="c1">
+    <h2><span class="n">1</span>docker-compose.yml — ml 서비스 추가</h2>
+    <div class="note say"><span class="tag">설명</span><p>먼저 <b>02 폴더를 컨테이너로 띄운다</b>. 이미지를 따로 만들지 않고 <code>../02</code>를 그대로 빌드한다.</p></div>
+    <pre><span class="cmt"># services: 안에, redis 다음에 추가</span>
+
+  # ML 모델 서비스 (SAMPLE 02 의 FastAPI). BN 이 예측을 이 서비스로 위임한다.
+  ml:
+    image: ml-sample
+    build:
+      context: ../02
+    container_name: ml-container
+    ports:
+      - "8001:8001"
+    networks:
+      custom-network:
+        ipv4_address: 172.30.0.50</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p><code>build: context: ../02</code>: <span class="rule">02 폴더를 그대로 이미지로 만듭니다.</span> 02의 Dockerfile이 <code>COPY . .</code>로 <code>model.pkl</code>까지 넣기 때문에, <b>01을 먼저 돌려야</b> 의미 있는 이미지가 됩니다.</p>
+      <p><code>container_name: ml-container</code>: 이 이름이 곧 <span class="tt" data-tip="같은 도커 네트워크 안에서는 컨테이너 이름이 호스트명이 된다. localhost가 아니다.">네트워크 주소</span>가 됩니다. 2단계에서 BN이 이 이름으로 부릅니다.</p>
+      <p><code>ports: 8001:8001</code>: 브라우저에서 <code>localhost:8001/docs</code>로 직접 확인하기 위해 열어 둡니다. BN만 쓸 거면 없어도 됩니다.</p>
+      <p><span class="tt" data-tip="고정 IP. 다른 컨테이너와 겹치지 않게 db=10, redis=20, fn=30, bn=40 다음 번호로 50을 줬다.">ipv4_address: 172.30.0.50</span>: 기존 컨테이너들과 겹치지 않는 번호를 씁니다.</p></div>
+    <div class="note do"><span class="tag">여기서 확인</span><p><code>docker compose up ml</code>로 ML만 띄워 <code>curl http://localhost:8001/health</code>가 되는지 먼저 확인하면 좋습니다.</p></div>
+  </section>
+
+  <section id="c2">
+    <h2><span class="n">2</span>docker-compose.yml — BN이 ML을 찾게 연결</h2>
+    <div class="note say"><span class="tag">설명</span><p>BN에게 <b>ML의 주소</b>를 알려주고, ML이 뜬 다음 BN이 뜨게 순서를 잡는다.</p></div>
+    <pre>  bn:
+    <span class="cmt"># ...기존 설정...</span>
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-container:3306/testdb
+      <span class="cmt"># ...</span>
+      SERVER_PORT: 8080
+      ML_URL: http://ml-container:8001        <span class="cmt"># &lt;-- 추가</span>
+
+    depends_on:
+      db:
+        condition: service_healthy
+      ml:                                     <span class="cmt"># &lt;-- 추가</span>
+        condition: service_started</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p><code>ML_URL: http://ml-container:8001</code>: <span class="rule">localhost가 아니라 컨테이너 이름</span>입니다. 컨테이너 입장에서 localhost는 "자기 자신"이라 ML을 못 찾습니다. <b>가장 자주 하는 실수</b>입니다.</p>
+      <p>포트도 <b>8001</b>(컨테이너 내부 포트)입니다. 호스트 매핑(<code>8001:8001</code>)과 무관하게 내부에서는 원래 포트로 부릅니다.</p>
+      <p><code>depends_on: ml</code>: ML이 <span class="tt" data-tip="service_started는 '컨테이너가 시작됨'까지만 기다린다. db는 service_healthy라 '접속 가능'까지 기다린다. ML은 헬스체크를 안 걸어서 started로 충분.">시작된 뒤</span> BN이 뜹니다.</p>
+      <p>이 환경변수를 Java가 어떻게 읽는지는 3단계에서 나옵니다.</p></div>
+  </section>
+
+  <section id="c3">
+    <h2><span class="n">3</span>BN — PredictionController.java 신규 작성</h2>
+    <div class="note say"><span class="tag">설명</span><p>BN은 <b>예측을 직접 하지 않는다.</b> 요청을 ML로 넘기고 결과를 그대로 전달하는 <span class="rule">중계(프록시)</span> 역할만 한다.</p></div>
+    <h3>3-1. 클래스 뼈대 &amp; ML 주소 주입</h3>
+    <pre>@RestController
+@Slf4j
+@CrossOrigin(origins = "*")
+public class PredictionController {
+
+    // docker-compose 의 BN 환경변수 ML_URL 로 주입 (기본값: ml-container:8001)
+    @Value("${ml.url:http://ml-container:8001}")
+    private String mlUrl;
+
+    private final RestTemplate rt = new RestTemplate();</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p><code>@Value("${ml.url:...}")</code>가 2단계의 <code>ML_URL</code>을 읽습니다. <span class="tt" data-tip="Spring의 relaxed binding. 환경변수 ML_URL이 자동으로 ml.url 속성과 연결된다. 대문자·언더바가 소문자·점으로 매칭.">ML_URL → ml.url</span> 로 자동 매칭됩니다.</p>
+      <p><code>:http://ml-container:8001</code> 뒤쪽은 <b>기본값</b>입니다. 환경변수가 없어도 동작합니다.</p>
+      <p><span class="tt" data-tip="Spring에서 다른 서버로 HTTP 요청을 보내는 도구.">RestTemplate</span>: BN이 ML에게 요청을 보낼 때 쓰는 도구입니다.</p></div>
+
+    <h3>3-2. 공통 전달 함수 — forward()</h3>
+    <div class="note say"><span class="tag">설명</span><p>7개 엔드포인트가 <b>모두 같은 일</b>(ML로 넘기고 응답 전달)을 한다. 한 함수로 모은다.</p></div>
+    <pre>    /** ML 로 요청을 넘기고 응답(상태코드 포함)을 그대로 돌려준다 */
+    private ResponseEntity&lt;String&gt; forward(HttpMethod method, String path, Object body) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity&lt;Object&gt; request = new HttpEntity&lt;&gt;(body, headers);
+        try {
+            return rt.exchange(mlUrl + path, method, request, String.class);
+        } catch (HttpStatusCodeException e) {
+            // ML 이 404 를 주면 BN 도 404 를 준다 (500 으로 뭉개지 않는다)
+            log.warn("[ML {}] {} -&gt; {}", method, path, e.getStatusCode());
+            return ResponseEntity.status(e.getStatusCode())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(e.getResponseBodyAsString());
+        }
+    }</pre>
+    <div class="note exp"><span class="tag">코드 설명 — try/catch가 핵심</span>
+      <p><code>rt.exchange(...)</code>는 ML이 <b>404를 주면 예외를 던집니다.</b> 이걸 잡지 않으면 Spring이 <span class="rule">500 Internal Server Error로 바꿔 버려</span> 화면에서 원인을 알 수 없게 됩니다.</p>
+      <p><code>catch (HttpStatusCodeException e)</code>로 잡아 <b>ML의 상태코드와 본문을 그대로</b> 전달합니다. 02에서 만든 <code>{"detail":"해당 예측 이력이 없습니다"}</code>가 화면까지 살아서 갑니다.</p>
+      <p>응답 타입이 <code>String</code>인 이유: BN은 내용을 해석할 필요가 없습니다. <span class="tt" data-tip="JSON 문자열을 객체로 바꿨다가 다시 문자열로 만들 필요가 없다. 그대로 흘려보내는 게 빠르고 안전하다.">받은 JSON을 그대로 흘려보냅니다.</span></p></div>
+
+    <h3>3-3. 요청 형태 맞추기 — wrap()</h3>
+    <pre>    /** FN 은 features 만 보낸다 -&gt; ML 이 요구하는 {"features": {...}} 형태로 감싼다 */
+    private Map&lt;String, Object&gt; wrap(Map&lt;String, Object&gt; features) {
+        Map&lt;String, Object&gt; body = new HashMap&lt;&gt;();
+        body.put("features", features);
+        return body;
+    }</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p>02의 <code>PredictRequest</code>는 <code>{"features": {...}}</code>를 요구합니다(02의 4단계). 그런데 FN은 입력값만 보내는 게 자연스럽죠. <span class="rule">그 차이를 BN이 흡수합니다.</span></p>
+      <p>이렇게 하면 화면 코드가 ML의 내부 형식을 몰라도 됩니다.</p></div>
+
+    <h3>3-4. 엔드포인트 7개 연결</h3>
+    <pre>    @GetMapping("/api/spec")
+    public ResponseEntity&lt;String&gt; spec() {
+        return forward(HttpMethod.GET, "/spec", null);
+    }
+
+    @PostMapping("/api/predict")
+    public ResponseEntity&lt;String&gt; predict(@RequestBody Map&lt;String, Object&gt; features) {
+        log.info("[predict] features={}", features);
+        return forward(HttpMethod.POST, "/predict", wrap(features));
+    }
+
+    // ---------------- 예측 이력 CRUD ----------------
+
+    /** C : 예측 후 이력 저장 */
+    @PostMapping("/api/predictions")
+    public ResponseEntity&lt;String&gt; create(@RequestBody Map&lt;String, Object&gt; features) {
+        return forward(HttpMethod.POST, "/predictions", wrap(features));
+    }
+
+    /** R : 이력 목록 */
+    @GetMapping("/api/predictions")
+    public ResponseEntity&lt;String&gt; list(@RequestParam(defaultValue = "50") int limit) {
+        return forward(HttpMethod.GET, "/predictions?limit=" + limit, null);
+    }
+
+    /** R : 이력 단건 */
+    @GetMapping("/api/predictions/{id}")
+    public ResponseEntity&lt;String&gt; get(@PathVariable int id) {
+        return forward(HttpMethod.GET, "/predictions/" + id, null);
+    }
+
+    /** U : 입력을 바꿔 다시 예측하고 갱신 */
+    @PutMapping("/api/predictions/{id}")
+    public ResponseEntity&lt;String&gt; update(@PathVariable int id, @RequestBody Map&lt;String, Object&gt; features) {
+        return forward(HttpMethod.PUT, "/predictions/" + id, wrap(features));
+    }
+
+    /** D : 이력 삭제 */
+    @DeleteMapping("/api/predictions/{id}")
+    public ResponseEntity&lt;String&gt; delete(@PathVariable int id) {
+        return forward(HttpMethod.DELETE, "/predictions/" + id, null);
+    }</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p>각 메서드가 <b>한 줄</b>입니다. forward와 wrap을 만들어 뒀기 때문입니다. <span class="rule">BN 경로(/api/...)와 ML 경로(...)가 1:1로 대응</span>합니다.</p>
+      <p><code>/api/</code> 접두사를 붙인 이유: 템플릿의 기존 경로(<code>/join</code>·<code>/login</code>·<code>/user</code>)와 <b>겹치지 않게</b> 하기 위해서입니다.</p>
+      <p class="rule">중요 — 인증: 이 경로들은 SecurityConfig의 anyRequest().authenticated() 대상입니다. 즉 별도 코드 없이 자동으로 "로그인해야 호출 가능"이 됩니다.</p></div>
+    <div class="note do"><span class="tag">여기서 확인 — 실제로 검증한 결과</span></div>
+    <pre>cd BN &amp;&amp; ./gradlew compileJava</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>BUILD SUCCESSFUL
+<span class="cmt"># (종료코드 0. deprecation 관련 Note 는 템플릿 기존 코드의 것으로 무시해도 된다)</span></pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p>컴파일이 통과하면 문법·import가 맞다는 뜻입니다. 화면을 만들기 전에 여기서 먼저 막히는 걸 잡습니다.</p></div>
+  </section>
+
+  <section id="c4">
+    <h2><span class="n">4</span>FN — Predict.jsx 신규 작성</h2>
+    <div class="note say"><span class="tag">설명</span><p>화면을 만든다. <span class="rule">입력 폼을 하드코딩하지 않고 /api/spec 을 보고 자동으로 그린다.</span></p></div>
+    <h3>4-1. 상태와 초기 로딩</h3>
+    <pre>import { useState, useEffect } from "react";
+import api from "../api/axiosConfig";
+
+const Predict = () =&gt; {
+    const [spec, setSpec] = useState(null);
+    const [vals, setVals] = useState({});
+    const [rows, setRows] = useState([]);
+    const [editId, setEditId] = useState(null);   // null 이면 신규, 값이 있으면 수정 중
+    const [result, setResult] = useState(null);
+    const [error, setError] = useState(null);
+
+    const initVals = (s) =&gt; {
+        const v = {};
+        s.features.forEach((f) =&gt; { v[f.name] = f.kind === "num" ? f.default : 0; });
+        return v;
+    };
+
+    // R : 이력 목록
+    const loadRows = () =&gt; {
+        api.get("/api/predictions")
+            .then((r) =&gt; setRows(r.data))
+            .catch(() =&gt; setError("이력을 불러오지 못했습니다."));
+    };
+
+    // 입력 정의를 받아 폼 초기값 구성
+    useEffect(() =&gt; {
+        api.get("/api/spec")
+            .then((r) =&gt; {
+                setSpec(r.data);
+                setVals(initVals(r.data));
+                loadRows();
+            })
+            .catch(() =&gt; setError("모델 정보를 불러오지 못했습니다. 로그인 상태를 확인하세요."));
+    }, []);</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p><span class="tt" data-tip="화면이 처음 그려질 때 한 번 실행. 두 번째 인자 []가 '한 번만'을 의미한다.">useEffect(..., [])</span>: 화면이 열리면 <code>/api/spec</code>을 부릅니다.</p>
+      <p><code>initVals</code>: spec의 <code>default</code>(수치)와 0(선택 첫 항목)으로 <b>폼 초기값</b>을 만듭니다. 01의 8단계에서 저장한 <code>default</code>가 여기서 쓰입니다.</p>
+      <p><code>api</code>: 템플릿의 <code>axiosConfig</code>. <span class="tt" data-tip="baseURL이 /bn 으로 설정되어 nginx가 bn-container:8080으로 프록시한다. 로그인 토큰도 자동으로 함께 보낸다.">인증 토큰을 자동으로 실어 보냅니다.</span> 그래서 우리가 인증 코드를 안 써도 됩니다.</p>
+      <p><code>catch</code>: 로그인 안 했으면 401이 오므로 안내 문구를 띄웁니다.</p></div>
+
+    <h3>4-2. C와 U — 하나의 함수로</h3>
+    <pre>    // C(신규) 또는 U(수정)
+    const onSubmit = async (e) =&gt; {
+        e.preventDefault();
+        setError(null);
+        try {
+            const r = editId === null
+                ? await api.post("/api/predictions", vals)            // C
+                : await api.put(`/api/predictions/${editId}`, vals);  // U
+            setResult(r.data);
+            setEditId(null);
+            setVals(initVals(spec));
+            loadRows();
+        } catch (err) {
+            setError("예측 요청에 실패했습니다.");
+        }
+    };
+
+    // 수정 시작 : 이력의 입력값을 폼에 채운다
+    const onEdit = (row) =&gt; {
+        setVals(row.features);
+        setEditId(row.id);
+        setResult(null);
+    };
+
+    // D : 삭제
+    const onDelete = async (id) =&gt; {
+        try {
+            await api.delete(`/api/predictions/${id}`);
+            if (editId === id) onCancel();
+            loadRows();
+        } catch (err) {
+            setError("삭제에 실패했습니다.");
+        }
+    };</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p><code>editId</code> 하나로 <b>신규/수정을 구분</b>합니다. null이면 POST(C), 값이 있으면 PUT(U). 폼을 두 개 만들 필요가 없습니다.</p>
+      <p>저장 후 <b>반드시 <code>loadRows()</code></b>: 서버의 최신 목록을 다시 받아옵니다. 화면에서 임의로 배열을 조작하면 <span class="tt" data-tip="화면에 보이는 것과 DB의 실제 내용이 달라지는 문제. 서버에서 다시 받아오면 항상 일치한다.">서버와 어긋날</span> 수 있습니다.</p>
+      <p><code>onEdit</code>이 <code>row.features</code>를 그대로 폼에 넣습니다 — 02가 저장해 둔 입력이 되살아납니다.</p></div>
+
+    <h3>4-3. 폼 자동 생성 (렌더링)</h3>
+    <pre>            &lt;form onSubmit={onSubmit}&gt;
+                {spec.features.map((f) =&gt; (
+                    &lt;div key={f.name}&gt;
+                        &lt;label&gt;{f.label} : &lt;/label&gt;
+                        {f.kind === "num" ? (
+                            &lt;input type="number" value={vals[f.name]}
+                                onChange={(e) =&gt; onChange(f.name, Number(e.target.value))} /&gt;
+                        ) : (
+                            &lt;select value={vals[f.name]}
+                                onChange={(e) =&gt; onChange(f.name, Number(e.target.value))}&gt;
+                                {f.options.map((o, i) =&gt; (
+                                    &lt;option key={i} value={i}&gt;{o}&lt;/option&gt;
+                                ))}
+                            &lt;/select&gt;
+                        )}
+                    &lt;/div&gt;
+                ))}
+                &lt;button type="submit"&gt;{editId === null ? "예측하고 저장" : "수정 저장"}&lt;/button&gt;</pre>
+    <div class="note exp"><span class="tag">코드 설명 — 이 실습 구조의 핵심</span>
+      <p><code>spec.features.map(...)</code>: <span class="rule">입력칸을 코드에 적어두지 않고 spec을 보고 그립니다.</span></p>
+      <p><code>kind === "num"</code>이면 숫자 입력칸, 아니면 드롭다운. <code>options.map</code>으로 선택지를 채우는데 <b><code>value={i}</code> — 이름이 아니라 인덱스 번호</b>를 값으로 씁니다. 02가 번호를 받기 때문입니다(01의 학습 순서와 일치).</p>
+      <p class="rule">그래서 01에서 피처를 바꾸고 다시 학습하면 이 화면이 저절로 바뀝니다. React 코드는 한 줄도 안 고쳐도 됩니다.</p></div>
+  </section>
+
+  <section id="c5">
+    <h2><span class="n">5</span>FN — App.js 수정 (3줄)</h2>
+    <div class="note say"><span class="tag">설명</span><p>만든 화면을 메뉴와 주소에 연결한다. <b>딱 3줄</b>만 추가한다.</p></div>
+    <pre>import Logout from "./components/Logout"
+import Predict from "./components/Predict"          <span class="cmt">// &lt;-- 1) 추가</span>
+
+function App() {
+  return (
+    &lt;Router&gt;
+      &lt;Link to="/"&gt;MAIN&lt;/Link&gt; |
+      &lt;Link to="/user"&gt;USER&lt;/Link&gt; |
+      &lt;Link to="/predict"&gt;PREDICT&lt;/Link&gt; |                       <span class="cmt">// &lt;-- 2) 추가</span>
+      &lt;Link to="/join"&gt;JOIN&lt;/Link&gt; |
+      &lt;Routes&gt;
+        &lt;Route path="/user" element={&lt;User /&gt;} /&gt;
+        &lt;Route path="/predict" element={&lt;Predict /&gt;} /&gt;          <span class="cmt">// &lt;-- 3) 추가</span>
+      &lt;/Routes&gt;
+    &lt;/Router&gt;
+  );
+}</pre>
+    <div class="note exp"><span class="tag">코드 설명</span>
+      <p><code>Link</code>는 <b>메뉴 글자</b>, <code>Route</code>는 <b>주소와 화면 연결</b>입니다. 둘 다 있어야 합니다. <span class="tt" data-tip="Route만 있으면 주소를 직접 쳐야 들어갈 수 있고, Link만 있으면 눌러도 화면이 안 뜬다.">하나만 빠뜨리는 실수</span>가 흔합니다.</p></div>
+    <div class="note do"><span class="tag">여기서 확인 — 실제로 검증한 결과</span></div>
+    <pre>cd FN &amp;&amp; npm install &amp;&amp; npm run build</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>Compiled successfully.
+
+File sizes after gzip:
+  96.68 kB  build\static\js\main.496de471.js
+  1.75 kB   build\static\js\453.2846ede4.chunk.js
+  263 B     build\static\css\main.e6c13ad2.css
+
+The build folder is ready to be deployed.</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p>"Compiled successfully"면 JSX 문법과 import가 정상입니다. 도커로 띄우기 전에 여기서 오류를 먼저 잡습니다. <b>이 build 결과물은 확인용이므로 지워도 됩니다</b>(도커가 컨테이너 안에서 다시 빌드합니다).</p></div>
+  </section>
+
+  <h2 style="border-bottom:3px solid #2f6feb;padding-bottom:8px;margin-top:38px">2부. 실행 실습</h2>
+
+  <section id="r1">
+    <h2><span class="n">1</span>사전 확인 — 01을 끝냈는가</h2>
+    <div class="note say"><span class="tag">설명</span><p>ML 이미지는 <code>../02</code>를 빌드해 만든다. 그 안에 <code>model.pkl</code>이 없으면 <span class="rule">빌드는 되지만 컨테이너가 죽는다</span>.</p></div>
+    <pre>ls ../02/model.pkl ../02/feature_spec.json</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>../02/feature_spec.json  ../02/model.pkl</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p>두 파일이 보이면 준비 완료. <b>No such file</b>이면 01 폴더로 돌아가 노트북을 8단계까지 실행하세요.</p></div>
+  </section>
+
+  <section id="r2">
+    <h2><span class="n">2</span>전체 기동</h2>
+    <pre>docker compose up --build</pre>
+    <div class="out pred"><div class="olabel">예상 출력</div><pre>[+] Running 5/5
+ [OK] Container db-container     Healthy
+ [OK] Container redis-container  Started
+ [OK] Container ml-container     Started
+ [OK] Container bn-container     Healthy
+ [OK] Container fn-container     Started
+bn-container  | ... Started DemoApplication in 8.2 seconds</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p><b>처음 실행은 몇 분 걸립니다</b> — Java 의존성과 npm 패키지를 내려받아 빌드하기 때문. 두 번째부터는 캐시가 있어 빠릅니다.</p>
+      <p>순서에 주목: <code>db</code>가 <span class="tt" data-tip="컨테이너가 실제로 요청을 받을 준비가 됐는지 확인하는 설정. docker-compose.yml의 healthcheck.">Healthy</span>가 된 다음에야 <code>bn</code>이 뜹니다(2단계의 <code>depends_on</code>).</p>
+      <p><b>"Started DemoApplication"</b>이 보이면 준비 완료.</p></div>
+  </section>
+
+  <section id="r3">
+    <h2><span class="n">3</span>상태 확인</h2>
+    <div class="note say"><span class="tag">설명</span><p><b>새 터미널</b>을 열어 확인한다(위 터미널은 로그가 계속 흐름).</p></div>
+    <pre>docker compose ps
+curl http://localhost:8001/health      <span class="cmt"># ML이 살아있는지</span></pre>
+    <div class="out pred"><div class="olabel">예상 출력</div><pre>NAME              STATUS         PORTS
+db-container      Up (healthy)   0.0.0.0:3330-&gt;3306/tcp
+redis-container   Up             0.0.0.0:6380-&gt;6379/tcp
+ml-container      Up             0.0.0.0:8001-&gt;8001/tcp
+bn-container      Up (healthy)   0.0.0.0:8080-&gt;8080/tcp
+fn-container      Up             0.0.0.0:3000-&gt;80/tcp
+
+{"status":"UP","model":"서울 화재 인명피해 예측"}</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p>5개가 모두 <b>Up</b>이어야 합니다. <code>/health</code>의 모델 이름이 01에서 저장한 제목과 같다면 <b>model.pkl이 컨테이너 안에 잘 들어갔다</b>는 증거입니다(1단계의 <code>context: ../02</code>가 한 일).</p></div>
+  </section>
+
+  <section id="r4">
+    <h2><span class="n">4</span>접속 &amp; 회원가입</h2>
+    <pre>브라우저에서 열기:  http://localhost:3000</pre>
+    <div class="note exp"><span class="tag">화면 설명</span><p>상단에 <b>MAIN | USER | PREDICT | JOIN | LOGIN | LOGOUT</b>. <b>PREDICT</b>가 보이면 5단계가 반영된 것입니다. <b>JOIN</b>으로 계정을 만드세요 — 회원 정보는 MySQL에 저장됩니다.</p></div>
+  </section>
+
+  <section id="r5">
+    <h2><span class="n">5</span>로그인</h2>
+    <div class="note say"><span class="tag">설명</span><p>방금 만든 계정으로 <b>LOGIN</b>. BN이 <span class="tt" data-tip="JSON Web Token. 로그인했다는 증표를 담은 문자열. 이후 요청마다 이걸 보내 신원을 증명한다.">JWT</span>를 발급하고 Redis에 저장한다.</p></div>
+    <div class="note warn"><span class="tag">반드시 기억할 것</span><p><span class="rule">로그인하지 않으면 예측이 되지 않습니다.</span> 3단계에서 만든 <code>/api/**</code>가 SecurityConfig의 <code>anyRequest().authenticated()</code> 대상이기 때문입니다. <b>우리가 인증 코드를 쓰지 않았는데도</b> 보호됩니다.</p></div>
+  </section>
+
+  <section id="r6">
+    <h2><span class="n">6</span>예측 폼 열기 (PREDICT)</h2>
+    <div class="out pred"><div class="olabel">예상 화면</div><pre>서울 화재 인명피해 예측
+정확도 73.5% · ROC-AUC 0.7131
+
+새 예측
+  자치구       : [강남구      ▼]
+  화재유형      : [건축,구조물  ▼]
+  발화요인      : [부주의      ▼]
+  장소(대분류)   : [주거        ▼]
+  장소(중분류)   : [공동주택    ▼]
+  월          : [6      ]
+  시간대(0~23)  : [14     ]
+  [예측하고 저장]
+
+예측 이력 (0)
+  이력이 없습니다. 위에서 예측을 해보세요.</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p>이 폼은 4-3단계의 <code>spec.features.map(...)</code>이 그린 것입니다. 흐름: 화면 → <code>/api/spec</code>(BN) → <code>/spec</code>(ML) → <code>feature_spec.json</code>.</p>
+      <p>초기값 6·14는 01의 8단계에서 계산한 <b>중앙값</b>입니다.</p>
+      <p>"모델 정보를 불러오지 못했습니다"가 나오면 <b>로그인이 안 된 것</b>입니다(5단계로).</p></div>
+  </section>
+
+  <section id="r7">
+    <h2><span class="n">7</span>C — 예측하고 저장</h2>
+    <h3>7-1. 위험이 높은 상황</h3>
+    <table><tr><th>항목</th><th>값</th></tr>
+    <tr><td>자치구</td><td>중랑구</td></tr>
+    <tr><td>화재유형</td><td>건축,구조물</td></tr>
+    <tr><td>발화요인</td><td><b>방화</b></td></tr>
+    <tr><td>장소(대분류) / (중분류)</td><td><b>주거</b> / <b>공동주택</b></td></tr>
+    <tr><td>월 / 시간대</td><td>3 / <b>6</b> (새벽)</td></tr></table>
+    <div class="out"><div class="olabel">수행결과 (API로 검증한 실제 값)</div><pre>예측 결과 : 인명피해 있음
+{
+  "인명피해 없음": 0.0913,
+  "인명피해 있음": 0.9087
+}</pre></div>
+    <h3>7-2. 반대 상황</h3>
+    <table><tr><th>항목</th><th>값</th></tr>
+    <tr><td>자치구</td><td>은평구</td></tr>
+    <tr><td>화재유형</td><td><b>기타(쓰레기 화재등)</b></td></tr>
+    <tr><td>발화요인</td><td>전기적 요인</td></tr>
+    <tr><td>장소(대분류) / (중분류)</td><td><b>기타</b> / <b>야외</b></td></tr>
+    <tr><td>월 / 시간대</td><td>2 / 21</td></tr></table>
+    <div class="out"><div class="olabel">수행결과 (API로 검증한 실제 값)</div><pre>예측 결과 : 인명피해 없음
+{
+  "인명피해 없음": 0.9887,
+  "인명피해 있음": 0.0113
+}</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p><span class="rule">두 가지를 반드시 모두 해보세요.</span> 같은 모델이 91% ↔ 1%로 완전히 다르게 답합니다.</p>
+      <p>이때 흐름: 버튼 → <code>onSubmit</code>(4-2) → <code>POST /api/predictions</code> → BN <code>create()</code>(3-4) → <code>wrap()</code>으로 감쌈 → ML <code>POST /predictions</code> → <code>run_model</code> → model.pkl. <b>5개 단계를 거쳐 온 결과</b>입니다.</p></div>
+  </section>
+
+  <section id="r8">
+    <h2><span class="n">8</span>R — 이력 목록 확인</h2>
+    <div class="note say"><span class="tag">설명</span><p>화면 아래 <b>예측 이력</b> 표를 본다. <b>새로고침(F5)</b>해도 남아 있는지 확인한다.</p></div>
+    <div class="out pred"><div class="olabel">예상 화면</div><pre>예측 이력 (2)
+ ID | 결과        | 입력                | 시각                | 관리
+  2 | 인명피해 없음 | {"gu":21...} | 2026-07-15T09:43:58 | [수정][삭제]
+  1 | 인명피해 있음 | {"gu":24...} | 2026-07-15T09:43:58 | [수정][삭제]</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p>새로고침해도 남는 이유는 브라우저가 아니라 <b>ML 컨테이너의 <code>predictions.db</code></b>에 저장됐기 때문입니다. 최신 것이 위로 오는 건 02의 <code>ORDER BY id DESC</code> 때문입니다.</p></div>
+  </section>
+
+  <section id="r9">
+    <h2><span class="n">9</span>U — 수정</h2>
+    <div class="note exp"><span class="tag">해볼 것</span>
+      <p>7-1(고위험)로 저장한 이력을 <b>[수정]</b>해 7-2(저위험) 값으로 바꿔 저장해 보세요. 폼 제목이 <b>"이력 #1 수정"</b>으로 바뀌고(4-2의 <code>editId</code>), 저장하면 결과가 <b>"있음" → "없음"으로 뒤집힙니다.</b></p>
+      <p>단순히 값만 덮어쓴 게 아니라 <span class="rule">새 입력으로 모델을 다시 돌린</span> 것입니다(02의 8단계 <code>update_prediction</code>).</p>
+      <p><b>[취소]</b>를 누르면 새 예측 모드로 돌아갑니다.</p></div>
+  </section>
+
+  <section id="r10">
+    <h2><span class="n">10</span>D — 삭제</h2>
+    <div class="note exp"><span class="tag">결과 설명</span><p>해당 행이 사라지고 건수가 줄어듭니다. 4-2의 <code>onDelete</code>가 삭제 후 <code>loadRows()</code>로 목록을 다시 받아오기 때문입니다. 이걸로 C·R·U·D를 화면에서 모두 해본 것입니다.</p></div>
+  </section>
+
+  <section id="r11">
+    <h2><span class="n">11</span>종료</h2>
+    <pre>docker compose down        <span class="cmt"># 컨테이너 정지·삭제</span>
+docker compose down -v     <span class="cmt"># 볼륨(회원 DB)까지 삭제</span></pre>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p><code>down</code>만 하면 <b>회원 정보는 남습니다</b>(db-data 볼륨). 다시 <code>up</code>하면 같은 계정으로 로그인됩니다.</p>
+      <p>반면 <b>예측 이력은 사라집니다</b> — <code>predictions.db</code>는 볼륨이 아니라 컨테이너 안에 있기 때문입니다.</p></div>
+    <div class="note warn"><span class="tag">주의</span><p>여러 SAMPLE의 03은 같은 포트(3000/8080)를 씁니다. <b>한 번에 하나만</b> 실행하고, 바꿀 땐 반드시 <code>docker compose down</code> 후 다른 폴더에서 <code>up</code> 하세요.</p></div>
+  </section>
+
+  <section id="api">
+    <h2>참고 — BN이 제공하는 API</h2>
+    <table><tr><th>메서드</th><th>BN 경로</th><th>설명</th><th>ML로 전달</th></tr>
+    <tr><td>GET</td><td><code>/api/spec</code></td><td>입력 정의(폼 자동 생성)</td><td><code>/spec</code></td></tr>
+    <tr><td>POST</td><td><code>/api/predict</code></td><td>예측만 (저장 안 함)</td><td><code>/predict</code></td></tr>
+    <tr><td>POST</td><td><code>/api/predictions</code></td><td><b>C</b> 예측 후 이력 저장</td><td><code>/predictions</code></td></tr>
+    <tr><td>GET</td><td><code>/api/predictions</code></td><td><b>R</b> 이력 목록</td><td><code>/predictions</code></td></tr>
+    <tr><td>GET</td><td><code>/api/predictions/{id}</code></td><td><b>R</b> 이력 단건</td><td><code>/predictions/{id}</code></td></tr>
+    <tr><td>PUT</td><td><code>/api/predictions/{id}</code></td><td><b>U</b> 재예측·갱신</td><td><code>/predictions/{id}</code></td></tr>
+    <tr><td>DELETE</td><td><code>/api/predictions/{id}</code></td><td><b>D</b> 이력 삭제</td><td><code>/predictions/{id}</code></td></tr></table>
+    <div class="note exp"><span class="tag">BN이 하는 일은 두 가지뿐</span>
+      <p>1) <b>형태 맞추기</b>(<code>wrap</code>): FN의 <code>features</code>를 ML이 원하는 <code>{"features": {...}}</code>로 감쌈.</p>
+      <p>2) <b>상태코드 전달</b>(<code>forward</code>의 try/catch): ML의 404를 500으로 뭉개지 않고 그대로 전달.</p>
+      <p>예측 자체는 <b>전혀 하지 않습니다.</b> 그래서 모델을 바꿔도 BN 코드는 안 고쳐도 됩니다.</p></div>
+  </section>
+
+  <section id="wrap">
+    <h2>마무리 &amp; 다음</h2>
+    <h3>코드 작성 순서 요약</h3>
+    <div class="flow">템플릿 복사 → <b>compose: ml 서비스</b> → <b>compose: ML_URL·depends_on</b> → <b>BN 컨트롤러</b>(forward·wrap) → <b>FN Predict.jsx</b>(spec으로 폼 자동생성) → <b>App.js 3줄</b></div>
+    <table><tr><th>단계</th><th>파일</th><th>구분</th><th>확인 방법</th></tr>
+    <tr><td>1·2</td><td><code>docker-compose.yml</code></td><td>수정</td><td><code>docker compose up ml</code> → <code>/health</code></td></tr>
+    <tr><td>3</td><td><code>PredictionController.java</code></td><td><b>신규</b></td><td><code>./gradlew compileJava</code></td></tr>
+    <tr><td>4</td><td><code>Predict.jsx</code></td><td><b>신규</b></td><td rowspan="2"><code>npm run build</code></td></tr>
+    <tr><td>5</td><td><code>App.js</code></td><td>수정(3줄)</td></tr></table>
+    <ul>
+      <li><b>바깥 → 안</b>: 인프라(compose) → 중계(BN) → 화면(FN). 단계마다 컴파일·빌드로 확인.</li>
+      <li><b>인증은 공짜</b>: <code>/api/**</code>로 만들면 템플릿의 SecurityConfig가 자동으로 보호한다.</li>
+      <li><b>자동 생성</b>: 01의 <code>feature_spec.json</code> 하나가 02의 API와 03의 폼을 만든다. 모델을 바꿔도 <b>BN·FN 코드는 그대로</b>.</li>
+      <li><b>컨테이너 이름이 주소</b>: <code>localhost</code>가 아니라 <code>ml-container</code>.</li>
+    </ul>
+    <h3>자주 막히는 곳</h3>
+    <table><tr><th>증상</th><th>원인 · 확인</th></tr>
+    <tr><td>PREDICT에서 정보를 못 불러옴</td><td>로그인 안 함 → 5단계. 그래도 안 되면 <code>docker logs bn-container</code></td></tr>
+    <tr><td>BN 로그에 Connection refused</td><td>2단계 <code>ML_URL</code>이 <code>localhost</code>로 돼 있는지 확인 → <code>ml-container</code>여야 함</td></tr>
+    <tr><td>ml 컨테이너가 바로 죽음</td><td>01 미실행 → <code>../02/model.pkl</code> 확인</td></tr>
+    <tr><td>404가 500으로 나옴</td><td>3-2 <code>forward()</code>의 try/catch 누락</td></tr>
+    <tr><td>PREDICT 메뉴가 안 보임</td><td>5단계 <code>Link</code> 추가 확인</td></tr>
+    <tr><td>메뉴는 있는데 화면이 빈칸</td><td>5단계 <code>Route</code> 추가 확인</td></tr>
+    <tr><td>포트 충돌</td><td>다른 SAMPLE의 03이 떠 있는지 → <code>docker compose down</code></td></tr>
+    <tr><td>ML만 따로 확인하고 싶다</td><td><code>http://localhost:8001/docs</code>(Swagger)</td></tr></table>
+    <p class="lead">01(모델 학습) → 02(API 서비스) → 03(풀스택)까지, 머신러닝 모델이 <b>실제 서비스가 되는 전체 경로</b>를 완주했습니다.</p>
+  </section>
+
+  <footer>빅데이터 분석 모델링 · SAMPLE_1 / 03 풀스택 상세가이드 · 코드: PredictionController.java · Predict.jsx · App.js · docker-compose.yml</footer>
+</div>
+</div>
+<script>
+(function(){var L=[].slice.call(document.querySelectorAll('.side a[href^="#"]'));var M={};L.forEach(function(a){var s=document.getElementById(a.getAttribute('href').slice(1));if(s)M[a.getAttribute('href').slice(1)]=a;});var ids=Object.keys(M);function f(){var cur=null;ids.forEach(function(id){if(document.getElementById(id).getBoundingClientRect().top<=120)cur=id;});L.forEach(function(a){a.classList.remove('act');});if(cur)M[cur].classList.add('act');}document.addEventListener('scroll',f,{passive:true});window.addEventListener('load',f);f();})();
+</script>
+</body>
+</html>

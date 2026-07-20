@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  ml:
+    build: .
+    container_name: ml_sample_2
+    ports:
+      - "8002:8002"
+    restart: unless-stopped

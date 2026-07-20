@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>작업지시서 · 공공데이터 융합 DBMS 구축</title>
+<style>
+  :root{ --ink:#222; --muted:#777; --line:#eaeaea; --accent:#2f6feb; --do:#1a9e6a; --code:#f5f6f8; --out:#f2f8f4; --out-b:#cfe6d8; --warn:#d9822b; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic",sans-serif;line-height:1.75;font-size:16px}
+  .wrap{max-width:840px;margin:0 auto;padding:44px 22px 90px}
+  .kicker{color:var(--accent);font-weight:600;font-size:13px}
+  h1{margin:8px 0 6px;font-size:26px;font-weight:700}.sub{color:var(--muted);margin:0 0 12px}.meta{color:var(--muted);font-size:14px;margin:0 0 4px}
+  .flow{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px 15px;margin:14px 0;font-size:14px;color:#444}.flow b{color:var(--accent)}
+  .hint{font-size:13px;color:var(--muted);margin:8px 0 0}
+  section{padding:26px 0;border-bottom:1px solid var(--line)}section:last-of-type{border-bottom:none}
+  h2{margin:0 0 4px;font-size:19px;font-weight:700}h2 .n{color:var(--accent);margin-right:8px}h3{margin:18px 0 4px;font-size:16px}
+  .lead{color:var(--muted);margin:2px 0 10px}
+  .note{margin:12px 0;padding-left:14px;border-left:3px solid var(--line)}.note .tag{font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase}
+  .note.do{border-left-color:var(--do)}.note.do .tag{color:var(--do)}.note.say{border-left-color:var(--accent)}.note.say .tag{color:var(--accent)}
+  .note.exp{border-left-color:var(--do);background:#fbfefc}.note.exp .tag{color:var(--do)}.note p{margin:3px 0}
+  .note.warn{border-left-color:var(--warn);background:#fffdf7}.note.warn .tag{color:var(--warn)}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:13px 15px;overflow:auto;font-family:Consolas,"D2Coding",monospace;font-size:13.5px;line-height:1.6;margin:12px 0;color:#1b1f24}pre .cmt{color:#9aa0a6}
+  .out{margin:10px 0}
+  .out .olabel{font-size:12px;font-weight:700;color:var(--do);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px}
+  .out pre{background:var(--out);border:1px solid var(--out-b);color:#123}
+  .out pre .trunc{color:#9aa0a6}
+  .out.pred .olabel{color:var(--warn)}
+  .out.pred pre{background:#fffdf7;border-color:#f0dcc0}
+  code{background:#f0f1f3;border-radius:5px;padding:1px 6px;font-family:Consolas,monospace;font-size:14px}
+  ul,ol{margin:8px 0;padding-left:20px}li{margin:3px 0}.rule{font-weight:700;color:var(--accent)}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}th,td{border:1px solid var(--line);padding:7px 10px;text-align:left}th{background:#fafbfc}
+  .tt{border-bottom:1px dotted var(--accent);cursor:help;position:relative}
+  .tt:hover::after{content:attr(data-tip);position:absolute;left:0;bottom:135%;background:#222;color:#fff;padding:7px 10px;border-radius:6px;font-size:12.5px;font-weight:400;line-height:1.55;white-space:normal;width:max-content;max-width:280px;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  .tt:hover::before{content:'';position:absolute;left:12px;bottom:120%;border:6px solid transparent;border-top-color:#222;z-index:20}
+  footer{color:var(--muted);font-size:13px;margin-top:32px}
+  .layout{display:flex;align-items:flex-start;max-width:1180px;margin:0 auto}
+  .side{position:sticky;top:0;align-self:flex-start;flex:0 0 190px;max-height:100vh;overflow-y:auto;padding:44px 14px 40px;border-right:1px solid var(--line);font-size:13.5px}
+  .side-title{font-weight:700;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;padding-left:8px}
+  .side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .side a:hover{background:var(--code);color:var(--accent)}
+  .side a.act{color:var(--accent);font-weight:600;background:var(--code)}
+  .layout .wrap{margin:0 auto}
+  .src{font-size:13px;color:var(--muted);margin:8px 0 0}.src a{color:var(--accent);text-decoration:none;border-bottom:1px solid #cfe0ff}.src a:hover{border-bottom-color:var(--accent)}
+  .ds{margin:14px 0;border:1px solid var(--line);border-radius:8px;background:#fcfdff}
+  .ds>summary{cursor:pointer;padding:11px 15px;font-weight:700;font-size:14px;color:var(--accent);list-style:none}
+  .ds>summary::-webkit-details-marker{display:none}
+  .ds>summary::before{content:"\25B8  "}
+  .ds[open]>summary::before{content:"\25BE  "}
+  .ds .dsbody{padding:2px 15px 14px}
+  .ds h4{margin:15px 0 4px;font-size:14px;color:var(--ink);border-left:3px solid var(--accent);padding-left:8px}
+  .ds p{margin:4px 0;font-size:14px}
+  .ds table{margin:6px 0;font-size:13.5px}
+  .ds .approach{padding-left:2px;margin:5px 0}
+  .ds .tag2{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:10px;background:var(--code);color:var(--accent);margin-right:6px}
+  @media (max-width:760px){.layout{flex-direction:column}.side{position:static;flex:none;width:100%;max-height:none;border-right:none;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:2px;padding:14px}.side-title{width:100%}}
+  @media print{.side{display:none}.layout{display:block}section{page-break-inside:avoid}.tt{border:none}}
+</style>
+
+<style>img{max-width:100%;border:1px solid #e3e6ea;border-radius:6px;margin:10px 0;display:block}</style></head>
+<body>
+<div class="layout"><nav class="side"><div class="side-title">목차</div><a href="#intro">과제 개요</a><a href="#target">만들 것</a><a href="#data">사용 데이터</a><div style="font-size:11px;color:#9aa0a6;font-weight:700;margin:10px 0 3px;padding-left:9px">작업 지시</div><a href="#w1">1. 01 모델 학습</a><a href="#w2">2. 02 ML API</a><a href="#w3">3. 03 풀스택</a><div style="font-size:11px;color:#9aa0a6;font-weight:700;margin:10px 0 3px;padding-left:9px">실행화면(예시)</div><a href="#r1">01 실행화면</a><a href="#r2">02 실행화면</a><a href="#r3">03 실행화면</a><div style="font-size:11px;color:#9aa0a6;font-weight:700;margin:10px 0 3px;padding-left:9px">제출·평가</div><a href="#submit">제출물</a><a href="#score">평가 기준</a></nav>
+  <div class="wrap">
+  <div class="kicker">작업지시서 · 공공데이터 융합 DBMS 구축 (56시간) · 문제해결시나리오</div>
+  <h1>공공데이터를 활용한 예측 서비스 구축</h1>
+  <p class="sub">공공데이터포털의 CSV 한 건을 받아 <b>모델 학습 → API 서비스 → 풀스택 통합</b>까지 완성한다.</p>
+  <p class="meta">교과목: 공공데이터 융합 DBMS 구축 · 능력단위요소: 공공데이터 융합 기초(16h) / 공공데이터 융합 DBMS 구축(40h) · 평가: 문제해결시나리오</p>
+  <div class="flow"><b>이 문서는 지시서입니다.</b> 아래 <b>SAMPLE_1</b> 은 <span class="rule">여러분이 제출할 결과물의 예시</span>입니다.
+  같은 구조로, <b>본인이 고른 다른 공공데이터</b>로 만드십시오. 화면·수치는 데이터에 따라 달라집니다.</div>
+
+  <section id="intro">
+    <h2>과제 개요</h2>
+    <div class="note say"><span class="tag">시나리오</span>
+      <p>여러분은 공공데이터를 활용해 <b>예측 서비스를 만드는 개발자</b>입니다. 공공데이터포털에서 데이터를 받아
+      이진분류 모델을 학습시키고, 그 모델을 <b>API로 서비스</b>한 뒤, <b>로그인이 필요한 웹 서비스</b>에 통합해야 합니다.</p>
+      <p>예측 결과는 <b>DB에 이력으로 남아야</b> 하고, 사용자는 화면에서 조회·수정·삭제할 수 있어야 합니다.</p></div>
+    <div class="note exp"><span class="tag">완성하면 이렇게 된다</span>
+      <p>브라우저에서 회원가입·로그인 → 입력 폼에 값을 넣고 <b>예측하고 저장</b> → 결과와 확률이 표시되고 <b>이력 표</b>에 쌓임 → 수정·삭제 가능.</p>
+      <p class="rule">데이터 흐름: 브라우저(FN) → Spring Boot(BN, 인증·중계) → FastAPI(ML) → model.pkl</p></div>
+  </section>
+
+  <section id="target">
+    <h2>만들 것 — 폴더 3개</h2>
+    <table><tr><th style="width:70px">폴더</th><th style="width:190px">역할</th><th>산출물</th></tr>
+    <tr><td><b>01</b></td><td>모델 학습 (주피터)</td><td><code>모델학습.ipynb</code> → <code>model.pkl</code>, <code>feature_spec.json</code></td></tr>
+    <tr><td><b>02</b></td><td>ML API (FastAPI)</td><td><code>main.py</code>, <code>model.py</code>, <code>store.py</code>, <code>Dockerfile</code></td></tr>
+    <tr><td><b>03</b></td><td>풀스택 (docker compose)</td><td>템플릿 + <code>PredictionController.java</code>, <code>Predict.jsx</code></td></tr></table>
+    <div class="note warn"><span class="tag">반드시 지킬 것</span>
+      <p>1. 데이터는 <b>공공데이터포털(data.go.kr)</b> 에서 받은 CSV 여야 하고, <b>출처를 명시</b>한다.</p>
+      <p>2. 타겟은 <b>이진분류</b>(두 가지 답)여야 한다.</p>
+      <p>3. <b>03의 인증(회원가입·로그인) 코드는 템플릿 그대로</b> 쓴다. 여러분이 만들 것은 <b>ML 연결 부분</b>이다.</p>
+      <p>4. 예측 이력 <b>CRUD(생성·조회·수정·삭제)</b> 가 화면에서 모두 동작해야 한다.</p></div>
+  </section>
+
+  <section id="data">
+    <h2>사용 데이터 — 예시(SAMPLE_1)의 경우</h2>
+    <p class="src">데이터 출처: <a href="https://www.data.go.kr/data/15044003/fileData.do" target="_blank" rel="noopener">공공데이터포털 &gt; 소방청_화재발생 정보 (data.go.kr/data/15044003)</a></p>
+    <table><tr><th style="width:110px">항목</th><th>내용</th></tr>
+    <tr><td>데이터</td><td>소방청_화재발생 정보 (전국 191,510건 중 <b>서울 26,760건</b>)</td></tr>
+    <tr><td>타겟</td><td><b>인명피해 여부</b> — 사망·부상이 1명이라도 있으면 1 (전체의 3.9%)</td></tr>
+    <tr><td>입력(7개)</td><td>자치구 · 화재유형 · 발화요인 · 장소(대/중) · 월 · 시간대</td></tr>
+    <tr><td>성능</td><td>정확도 0.7347 · <b>ROC-AUC 0.7131</b></td></tr></table>
+    <div class="note say"><span class="tag">여러분의 데이터 고르기</span>
+      <p><b>행 단위 데이터</b>(한 줄 = 한 사건/한 건)를 고르십시오. 통계·집계 데이터는 학습할 수 없습니다.</p>
+      <p>타겟이 <b>데이터에 이미 있으면</b> 좋고(적합/부적합, 사고 유무 등), 없으면 <b>연속값을 중앙값으로 잘라</b> 만들어도 됩니다.</p></div>
+  </section>
+
+  <h2 style="border-bottom:3px solid #2f6feb;padding-bottom:8px;margin-top:38px">작업 지시</h2>
+
+  <section id="w1">
+    <h2><span class="n">1</span>01 — 모델 학습</h2>
+    <div class="note do"><span class="tag">지시</span><p>주피터 노트북으로 <b>표준 워크플로우 8단계</b>를 작성하고, 마지막에 <code>model.pkl</code> 과 <code>feature_spec.json</code> 을 <b>02 폴더에</b> 저장하시오.</p></div>
+    <div class="flow">로드 → EDA → 결측치 → 타겟분리·인코딩 → 분할(stratify) → 학습 → 평가(ROC-AUC) → 저장</div>
+
+    <h3>기본 코드 — 이 뼈대를 지킬 것</h3>
+    <pre>df = pd.read_csv('data/파일명.csv', encoding='cp949')   <span class="cmt"># 공공데이터는 대부분 cp949</span>
+plt.rcParams['font.family'] = 'Malgun Gothic'          <span class="cmt"># 그래프 한글 깨짐 방지</span>
+
+TARGET = '인명피해여부'
+LABELS = ['인명피해 없음', '인명피해 있음']
+df[TARGET] = (pd.to_numeric(df['인명피해(명)소계'], errors='coerce').fillna(0) &gt; 0).astype(int)</pre>
+
+    <h3>중요 코드 ① — 피처 정의 (가장 중요)</h3>
+    <div class="note warn"><span class="tag">여기가 핵심</span><p><code>feature_spec.json</code> 하나가 <b>02의 API 문서와 03의 입력 화면을 자동으로 만듭니다.</b> 이 구조를 반드시 지키십시오.</p></div>
+    <pre><span class="cmt"># 코드 열 이름은 영문으로! 이 이름이 그대로 API 의 JSON 키가 된다.</span>
+<span class="cmt"># 한글 키로 만들면 윈도우 터미널에서 curl 로 보낼 때 인코딩이 깨진다.</span>
+CODE = {'시군구': 'gu', '화재유형': 'fire_type', '발화요인대분류': 'cause',
+        '장소대분류': 'place_main', '장소중분류': 'place_sub'}
+
+OPTIONS = {}
+for c in CATS:
+    OPTIONS[c] = sorted(df[c].unique())
+    df[CODE[c]] = df[c].map({v: i for i, v in enumerate(OPTIONS[c])})
+
+FEATURES = [
+    {'name': 'gu',   'label': '자치구',      'kind': 'cat', 'options': OPTIONS['시군구']},
+    {'name': 'month','label': '월',          'kind': 'num'},
+    <span class="cmt"># name=기계가 쓰는 영문 이름 / label=화면에 보이는 한글 / kind=cat(선택) 또는 num(숫자)</span>
+]</pre>
+    <div class="note exp"><span class="tag">왜 이렇게 하나</span>
+      <p><code>kind</code> 가 <b>cat</b> 이면 03 화면에 <b>드롭다운</b>, <b>num</b> 이면 <b>숫자 입력칸</b>이 자동으로 생깁니다.</p>
+      <p><code>options</code> 의 <b>순서가 곧 코드 번호</b>입니다(0,1,2...). <span class="rule">학습할 때의 순서와 서빙할 때의 순서가 반드시 같아야</span> 하므로 그대로 저장합니다.</p></div>
+
+    <h3>중요 코드 ② — 누수 방지</h3>
+    <pre><span class="cmt"># 타겟 그 자체(사망·부상)와 사후 결과값(재산피해)은 입력에서 반드시 뺀다</span>
+<span class="cmt"># 남길 것: 예측 시점에 알 수 있는 정보뿐</span></pre>
+    <div class="note warn"><span class="tag">감점 요인</span><p>정답을 입력에 넣으면 ROC-AUC 가 0.99 로 치솟습니다. <b>성능이 너무 좋으면 의심하십시오.</b></p></div>
+
+    <h3>중요 코드 ③ — 불균형 대응 · 저장</h3>
+    <pre>model = RandomForestClassifier(n_estimators=100, max_depth=8, random_state=42,
+                               n_jobs=-1, class_weight='balanced')   <span class="cmt"># 불균형이면 필수</span>
+
+joblib.dump(model, '../02/model.pkl')
+json.dump(spec, open('../02/feature_spec.json','w',encoding='utf-8'), ensure_ascii=False, indent=2)
+
+<span class="cmt"># 이 버전이 02/requirements.txt 와 같아야 서버가 뜬다</span>
+print('numpy', np.__version__, '| sklearn', sklearn.__version__)</pre>
+    <div class="note exp"><span class="tag">평가 지표</span>
+      <p><b>불균형</b>(양성이 적음)이면 정확도는 착시입니다. <b>ROC-AUC 와 소수 클래스 recall</b> 을 보고, <code>class_weight='balanced'</code> 를 쓰십시오.</p>
+      <p><b>균형</b>(50:50)이면 정확도가 유효하고 <code>class_weight</code> 는 필요 없습니다. <span class="rule">처방은 데이터를 보고 정합니다.</span></p></div>
+  </section>
+
+  <section id="w2">
+    <h2><span class="n">2</span>02 — ML API (FastAPI)</h2>
+    <div class="note do"><span class="tag">지시</span><p><code>model.pkl</code> 을 <b>REST API</b> 로 서비스하고, 예측 이력 <b>CRUD</b> 를 만드시오. 포트는 <b>8001</b>.</p></div>
+    <table><tr><th style="width:150px">파일</th><th>만들 내용</th></tr>
+    <tr><td><code>model.py</code></td><td>pkl 로드 · 예측 함수</td></tr>
+    <tr><td><code>main.py</code></td><td>엔드포인트 8개 (health/spec/predict + CRUD 5)</td></tr>
+    <tr><td><code>store.py</code></td><td>SQLite 이력 저장소</td></tr>
+    <tr><td><code>requirements.txt</code></td><td><b>ASCII 만</b> — 한글 주석을 넣으면 pip 가 죽는다</td></tr></table>
+
+    <h3>기본 코드 — model.py (가장 안쪽부터)</h3>
+    <pre>def load_model(path="model.pkl"):
+    return joblib.load(path)
+
+def predict(model, input_data):
+    df = pd.DataFrame([input_data])          <span class="cmt"># dict 하나 -> 1행짜리 표</span>
+    return model.predict(df)[0], model.predict_proba(df)[0]</pre>
+
+    <h3>중요 코드 ① — 시작 시 1회 로드</h3>
+    <pre>spec  = json.load(open("feature_spec.json", encoding="utf-8"))
+model = load_model("model.pkl")               <span class="cmt"># 요청마다 읽으면 느리다</span>
+LABELS = spec["target_labels"]
+
+app = FastAPI(title=spec["title"] + " ML API")
+app.add_middleware(CORSMiddleware, allow_origins=["*"],
+                   allow_methods=["*"], allow_headers=["*"])   <span class="cmt"># React 가 부를 수 있게</span>
+store.init_db()</pre>
+
+    <h3>중요 코드 ② — 예측 로직은 한 곳에</h3>
+    <pre>def run_model(features):
+    pred, proba = predict(model, features)
+    pred = int(pred)                          <span class="cmt"># numpy 타입은 JSON 변환 불가!</span>
+    return {"prediction": pred, "label": LABELS[pred],
+            "proba": {LABELS[0]: round(float(proba[0]),4),
+                      LABELS[1]: round(float(proba[1]),4)}}
+
+@app.post("/predict")                         <span class="cmt"># 예측만 (03 의 BN 이 호출)</span>
+def do_predict(req: PredictRequest):
+    return run_model(req.features)</pre>
+    <div class="note exp"><span class="tag">왜 함수로 뺐나</span><p><code>/predict</code>·<code>POST /predictions</code>·<code>PUT /predictions/{id}</code> <b>세 곳</b>이 예측을 합니다. 복사해 두면 한 곳만 고치고 나머지를 빠뜨립니다.</p></div>
+
+    <h3>중요 코드 ③ — CRUD 와 404</h3>
+    <pre>@app.post("/predictions", status_code=201)    <span class="cmt"># C : 생성은 201</span>
+def create_prediction(req: PredictRequest):
+    return store.create(req.features, run_model(req.features))
+
+@app.put("/predictions/{pid}")                <span class="cmt"># U : 값만 바꾸는 게 아니라 다시 예측!</span>
+def update_prediction(pid: int, req: PredictRequest):
+    row = store.update(pid, req.features, run_model(req.features))
+    if row is None:
+        raise HTTPException(status_code=404, detail="해당 예측 이력이 없습니다")
+    return row</pre>
+    <div class="note warn"><span class="tag">자주 하는 실수</span>
+      <p><b>numpy 타입</b>: <code>int()</code>·<code>float()</code> 변환을 빠뜨리면 <code>Object of type int64 is not JSON serializable</code>.</p>
+      <p><b>Dockerfile</b>: <code>--host 0.0.0.0</code> 이어야 컨테이너 밖에서 접속됩니다.</p>
+      <p><b>버전</b>: <code>requirements.txt</code> 가 01의 학습 환경과 다르면 <code>ModuleNotFoundError</code> 로 서버가 안 뜹니다.</p></div>
+  </section>
+
+  <section id="w3">
+    <h2><span class="n">3</span>03 — 풀스택 통합</h2>
+    <div class="note do"><span class="tag">지시</span><p>인증이 완성된 <b>템플릿(03_DOCKER_COMPOSE)을 복사</b>해 오고, <b>ML 연결 코드만</b> 추가하시오. <span class="rule">인증 코드는 건드리지 않는다.</span></p></div>
+    <table><tr><th style="width:60px">순서</th><th style="width:230px">파일</th><th>구분</th></tr>
+    <tr><td>1·2</td><td><code>docker-compose.yml</code></td><td>수정 — ml 서비스 · ML_URL</td></tr>
+    <tr><td>3</td><td><code>BN/.../PredictionController.java</code></td><td><b>신규</b></td></tr>
+    <tr><td>4</td><td><code>FN/src/components/Predict.jsx</code></td><td><b>신규</b></td></tr>
+    <tr><td>5</td><td><code>FN/src/App.js</code></td><td>수정 (3줄)</td></tr></table>
+
+    <h3>중요 코드 ① — compose 에 ML 붙이기</h3>
+    <pre>  ml:
+    build:
+      context: ../02                    <span class="cmt"># 02 폴더를 그대로 이미지로</span>
+    container_name: ml-container
+    ports: ["8001:8001"]
+
+  bn:
+    environment:
+      ML_URL: http://ml-container:8001  <span class="cmt"># localhost 아님! 컨테이너 이름이 주소</span>
+    depends_on:
+      ml: { condition: service_started }</pre>
+    <div class="note warn"><span class="tag">가장 자주 하는 실수</span><p><code>ML_URL</code> 을 <code>localhost</code> 로 쓰면 <b>컨테이너 자신</b>을 가리켜 ML 을 못 찾습니다.</p></div>
+
+    <h3>중요 코드 ② — BN 은 중계만 한다</h3>
+    <pre>@Value("${ml.url:http://ml-container:8001}")   <span class="cmt"># compose 의 ML_URL 이 주입됨</span>
+private String mlUrl;
+
+private ResponseEntity&lt;String&gt; forward(HttpMethod method, String path, Object body) {
+    try {
+        return rt.exchange(mlUrl + path, method, request, String.class);
+    } catch (HttpStatusCodeException e) {
+        return ResponseEntity.status(e.getStatusCode())    <span class="cmt"># ML 의 404 를 그대로 전달</span>
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(e.getResponseBodyAsString());
+    }
+}
+private Map&lt;String,Object&gt; wrap(Map&lt;String,Object&gt; f) {   <span class="cmt"># FN 은 features 만 보냄</span>
+    Map&lt;String,Object&gt; b = new HashMap&lt;&gt;(); b.put("features", f); return b;
+}</pre>
+    <div class="note exp"><span class="tag">BN 이 하는 일은 두 가지뿐</span>
+      <p>1) <b>형태 맞추기</b>(<code>wrap</code>) — FN 의 <code>features</code> 를 ML 이 원하는 <code>{"features":{...}}</code> 로.</p>
+      <p>2) <b>상태코드 전달</b>(try/catch) — 안 잡으면 ML 의 404 가 <b>500 으로 뭉개져</b> 원인을 알 수 없습니다.</p>
+      <p><b>예측은 직접 하지 않습니다.</b> 경로를 <code>/api/**</code> 로 만들면 템플릿의 SecurityConfig 가 <span class="rule">자동으로 로그인을 요구</span>합니다.</p></div>
+
+    <h3>중요 코드 ③ — 화면은 spec 을 보고 그린다</h3>
+    <pre>useEffect(() =&gt; { api.get("/api/spec").then(r =&gt; { setSpec(r.data); ... }) }, []);
+
+{spec.features.map((f) =&gt; (
+    f.kind === "num"
+      ? &lt;input type="number" value={vals[f.name]} .../&gt;
+      : &lt;select value={vals[f.name]} ...&gt;
+          {f.options.map((o,i) =&gt; &lt;option key={i} value={i}&gt;{o}&lt;/option&gt;)}
+        &lt;/select&gt;
+))}</pre>
+    <div class="note exp"><span class="tag">이 구조의 핵심</span>
+      <p>입력칸을 <b>코드에 적어두지 않습니다.</b> <code>/api/spec</code> 응답을 보고 그립니다. <code>value={i}</code> — <b>이름이 아니라 인덱스 번호</b>를 보냅니다.</p>
+      <p class="rule">그래서 01에서 피처를 바꿔 다시 학습하면 화면이 저절로 바뀝니다. React 코드는 한 줄도 안 고쳐도 됩니다.</p></div>
+
+    <h3>단계별 확인 방법</h3>
+    <table><tr><th style="width:60px">단계</th><th>확인 명령</th></tr>
+    <tr><td>1·2</td><td><code>docker compose up ml</code> → <code>curl localhost:8001/health</code></td></tr>
+    <tr><td>3</td><td><code>cd BN &amp;&amp; ./gradlew compileJava</code> → BUILD SUCCESSFUL</td></tr>
+    <tr><td>4·5</td><td><code>cd FN &amp;&amp; npm run build</code> → Compiled successfully</td></tr>
+    <tr><td>전체</td><td><code>docker compose up --build</code> → 컨테이너 5개 Up</td></tr></table>
+  </section>
+
+  <h2 style="border-bottom:3px solid #2f6feb;padding-bottom:8px;margin-top:38px">실행화면 (예시 — SAMPLE_1 완성본)</h2>
+  <div class="note say"><span class="tag">안내</span><p>아래는 <b>SAMPLE_1 을 실제로 실행해 캡처한 화면</b>입니다. 여러분의 결과물도 <b>같은 흐름</b>이어야 합니다(데이터가 다르니 항목·수치는 다릅니다).</p></div>
+
+  <section id="r1">
+    <h2>01 실행화면 — 모델 학습</h2>
+    <h3>타겟 분포 (2단계 EDA)</h3>
+    <img src="실행화면/01-1_타겟분포.png" alt="타겟 분포">
+    <div class="note exp"><span class="tag">무엇을 봐야 하나</span><p>인명피해 없음 25,709 vs 있음 1,051 — <b>3.9% 의 심한 불균형</b>. 이 그래프를 보고 <code>class_weight='balanced'</code> 를 쓰기로 결정합니다.</p></div>
+    <h3>ROC 곡선 (7단계 평가)</h3>
+    <img src="실행화면/01-2_ROC곡선.png" alt="ROC 곡선">
+    <div class="note exp"><span class="tag">무엇을 봐야 하나</span><p>대각선(찍기, AUC 0.5)보다 위로 볼록해야 모델이 일을 한 것입니다. <b>AUC 0.713</b>. 불균형이라 정확도(0.7347)가 아니라 이 값을 봅니다.</p></div>
+  </section>
+
+  <section id="r2">
+    <h2>02 실행화면 — ML API</h2>
+    <h3>Swagger 자동 문서 (localhost:8001/docs)</h3>
+    <img src="실행화면/02-1_Swagger.png" alt="Swagger UI">
+    <div class="note exp"><span class="tag">무엇을 봐야 하나</span>
+      <p>엔드포인트 <b>8개</b>가 보입니다 — <code>/health</code>, <code>/spec</code>, <code>/predict</code> + <b>CRUD 5개</b>(POST/GET/GET/PUT/DELETE <code>/predictions</code>).</p>
+      <p><span class="rule">이 문서는 우리가 만들지 않았습니다.</span> 데코레이터와 <code>PredictRequest</code> 에서 자동 생성된 것입니다. <b>Try it out</b> 으로 직접 실행해 볼 수 있습니다.</p></div>
+  </section>
+
+  <section id="r3">
+    <h2>03 실행화면 — 풀스택</h2>
+    <h3>1) 메인 (localhost:3000)</h3>
+    <img src="실행화면/03-1_메인화면.png" alt="메인 화면">
+    <div class="note exp"><span class="tag">확인</span><p>상단에 <b>PREDICT</b> 메뉴가 보이면 App.js 수정(5단계)이 반영된 것입니다.</p></div>
+
+    <h3>2) 회원가입 · 3) 로그인</h3>
+    <img src="실행화면/03-2_회원가입.png" alt="회원가입">
+    <img src="실행화면/03-3_로그인.png" alt="로그인">
+    <div class="note warn"><span class="tag">중요</span><p><b>로그인하지 않으면 예측이 되지 않습니다.</b> 템플릿의 SecurityConfig 가 <code>/api/**</code> 를 보호하기 때문입니다. 회원 정보는 MySQL 에 저장됩니다.</p></div>
+
+    <h3>4) 예측 폼 — 자동 생성</h3>
+    <img src="실행화면/03-4_예측폼_자동생성.png" alt="예측 폼">
+    <div class="note exp"><span class="tag">여기가 이 구조의 핵심</span>
+      <p>제목 "서울 화재 인명피해 예측", 정확도 73.5% · ROC-AUC 0.7131 이 <b>모두 <code>feature_spec.json</code> 에서 온 것</b>입니다.</p>
+      <p>입력칸 7개 — 드롭다운 5(자치구·화재유형·발화요인·장소 대/중) + 숫자 2(월·시간대). <span class="rule">React 코드에 하드코딩된 게 아니라 spec 을 보고 그린 것입니다.</span></p></div>
+
+    <h3>5) 예측 결과 — 고위험 (C: 예측하고 저장)</h3>
+    <img src="실행화면/03-5_고위험_예측결과.png" alt="고위험 예측 결과">
+    <div class="note exp"><span class="tag">입력값</span>
+      <p>중랑구 · 건축,구조물 · <b>방화</b> · <b>주거/공동주택</b> · 3월 · <b>새벽 6시</b> → <b>인명피해 있음 0.9087</b></p>
+      <p>새벽에 사람이 자고 있는 주거지 방화 — 데이터상 방화는 인명피해율 20.1%(평균 3.9%의 5배), 새벽 5시는 8.5%입니다. <b>모델이 근거 있는 판단</b>을 합니다.</p></div>
+
+    <h3>6) 예측 결과 — 저위험 + 이력 표 (R)</h3>
+    <img src="실행화면/03-6_저위험_예측과_이력.png" alt="저위험 예측과 이력">
+    <div class="note exp"><span class="tag">대비</span>
+      <p>은평구 · <b>기타(쓰레기 화재등)</b> · 전기적 요인 · <b>기타/야외</b> · 2월 · 21시 → <b>인명피해 없음 0.9887</b></p>
+      <p><span class="rule">같은 모델이 상황에 따라 91% ↔ 1% 로 완전히 다르게 답합니다.</span> 야외 쓰레기 화재는 인명피해율 0.6%입니다.</p>
+      <p>아래 <b>예측 이력 (2)</b> 표에 ID·결과·입력·시각·관리(수정/삭제)가 쌓였습니다. <b>새로고침해도 남습니다</b> — ML 컨테이너의 SQLite 에 저장됐기 때문입니다.</p></div>
+
+    <h3>7) 수정 모드 (U)</h3>
+    <img src="실행화면/03-7_수정모드.png" alt="수정 모드">
+    <div class="note exp"><span class="tag">확인</span><p>이력의 <b>[수정]</b> 을 누르면 제목이 <b>"이력 #1 수정"</b> 으로 바뀌고 그 입력이 폼에 채워집니다.</p></div>
+
+    <h3>8) 수정 후 — 라벨이 뒤집힌다</h3>
+    <img src="실행화면/03-8_수정후.png" alt="수정 후">
+    <div class="note exp"><span class="tag">여기를 반드시 확인</span><p>고위험 이력을 저위험 값으로 바꿔 저장하니 결과가 <b>"있음" → "없음"</b> 으로 바뀌었습니다. <span class="rule">값만 덮어쓴 게 아니라 새 입력으로 다시 예측</span>했기 때문입니다(02 의 <code>update_prediction</code> 이 <code>run_model</code> 을 재호출).</p></div>
+
+    <h3>9) 삭제 후 (D)</h3>
+    <img src="실행화면/03-9_삭제후.png" alt="삭제 후">
+    <div class="note exp"><span class="tag">확인</span><p>2건 → <b>1건</b>. 삭제 후 목록을 다시 불러옵니다. 이것으로 <b>C·R·U·D 네 가지를 화면에서 모두</b> 확인했습니다.</p></div>
+  </section>
+
+  <section id="submit">
+    <h2>제출물</h2>
+    <table><tr><th style="width:60px">번호</th><th style="width:200px">항목</th><th>내용</th></tr>
+    <tr><td>1</td><td>01 / 02 / 03 폴더</td><td>완성된 소스 전체 (<code>model.pkl</code>·<code>feature_spec.json</code> 포함)</td></tr>
+    <tr><td>2</td><td><b>결과보고서</b></td><td>데이터 출처·품질 진단·모델 성능·API 설계·통합 결과</td></tr>
+    <tr><td>3</td><td><b>실행화면 캡처</b></td><td>위 <b>01~03 실행화면과 같은 흐름</b>으로 본인 결과물을 캡처</td></tr></table>
+    <div class="note warn"><span class="tag">제출 전 확인</span>
+      <p>깨끗한 환경에서 <code>pip install -r requirements.txt</code> → 서버 기동 → <code>docker compose up --build</code> → 로그인 → 예측 → 이력 CRUD 가 <b>끊김 없이</b> 되는지 직접 해보십시오.</p></div>
+  </section>
+
+  <section id="score">
+    <h2>평가 기준 (문제해결시나리오 100점)</h2>
+    <table><tr><th style="width:150px">항목</th><th>내용</th><th style="width:60px">배점</th></tr>
+    <tr><td>데이터 확보·품질</td><td>공공데이터포털 출처 명시 · 행 단위 · 이진 타겟 · 품질(결측·불균형) 진단</td><td>15</td></tr>
+    <tr><td>01 모델 학습</td><td>8단계 워크플로우 · <b>누수 방지</b> · stratify · 지표 선택 근거</td><td>25</td></tr>
+    <tr><td>02 ML API</td><td>엔드포인트 8개 · <b>CRUD 동작</b> · 404 처리 · 버전 일치</td><td>25</td></tr>
+    <tr><td>03 통합</td><td>컨테이너 5개 기동 · <b>로그인 후 예측</b> · 폼 자동생성 · 이력 CRUD</td><td>25</td></tr>
+    <tr><td>보고서·발표</td><td>결과 해석의 타당성 · 실행화면</td><td>10</td></tr></table>
+    <div class="note exp"><span class="tag">감점 요인</span>
+      <p>· 정답을 입력에 넣어 <b>ROC-AUC 가 0.99</b> 인 경우 (누수)<br>
+      · 불균형인데 <b>정확도만</b> 보고 "성능이 좋다"고 결론<br>
+      · <code>feature_spec.json</code> 없이 화면에 입력칸을 <b>하드코딩</b><br>
+      · 로그인 없이 예측이 되는 경우 (인증 우회)</p></div>
+  </section>
+
+  <footer>공공데이터 융합 DBMS 구축 (56시간) · 작업지시서 · 예시: SAMPLE_1 (소방청 화재발생 정보)</footer>
+</div>
+</div>
+<script>
+(function(){var L=[].slice.call(document.querySelectorAll('.side a[href^="#"]'));var M={};L.forEach(function(a){var s=document.getElementById(a.getAttribute('href').slice(1));if(s)M[a.getAttribute('href').slice(1)]=a;});var ids=Object.keys(M);function f(){var cur=null;ids.forEach(function(id){if(document.getElementById(id).getBoundingClientRect().top<=120)cur=id;});L.forEach(function(a){a.classList.remove('act');});if(cur)M[cur].classList.add('act');}document.addEventListener('scroll',f,{passive:true});window.addEventListener('load',f);f();})();
+</script>
+</body>
+</html>

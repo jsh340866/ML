@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMPLE_3 / 01 모델 학습 - 상세가이드</title>
+<style>
+  :root{ --ink:#222; --muted:#777; --line:#eaeaea; --accent:#2f6feb; --do:#1a9e6a; --code:#f5f6f8; --out:#f2f8f4; --out-b:#cfe6d8; --warn:#d9822b; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic",sans-serif;line-height:1.75;font-size:16px}
+  .wrap{max-width:840px;margin:0 auto;padding:44px 22px 90px}
+  .kicker{color:var(--accent);font-weight:600;font-size:13px}
+  h1{margin:8px 0 6px;font-size:26px;font-weight:700}.sub{color:var(--muted);margin:0 0 12px}.meta{color:var(--muted);font-size:14px;margin:0 0 4px}
+  .flow{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px 15px;margin:14px 0;font-size:14px;color:#444}.flow b{color:var(--accent)}
+  .hint{font-size:13px;color:var(--muted);margin:8px 0 0}
+  section{padding:26px 0;border-bottom:1px solid var(--line)}section:last-of-type{border-bottom:none}
+  h2{margin:0 0 4px;font-size:19px;font-weight:700}h2 .n{color:var(--accent);margin-right:8px}h3{margin:18px 0 4px;font-size:16px}
+  .lead{color:var(--muted);margin:2px 0 10px}
+  .note{margin:12px 0;padding-left:14px;border-left:3px solid var(--line)}.note .tag{font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase}
+  .note.do{border-left-color:var(--do)}.note.do .tag{color:var(--do)}.note.say{border-left-color:var(--accent)}.note.say .tag{color:var(--accent)}
+  .note.exp{border-left-color:var(--do);background:#fbfefc}.note.exp .tag{color:var(--do)}.note p{margin:3px 0}
+  .note.warn{border-left-color:var(--warn);background:#fffdf7}.note.warn .tag{color:var(--warn)}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:13px 15px;overflow:auto;font-family:Consolas,"D2Coding",monospace;font-size:13.5px;line-height:1.6;margin:12px 0;color:#1b1f24}pre .cmt{color:#9aa0a6}
+  .out{margin:10px 0}
+  .out .olabel{font-size:12px;font-weight:700;color:var(--do);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px}
+  .out pre{background:var(--out);border:1px solid var(--out-b);color:#123}
+  .out pre .trunc{color:#9aa0a6}
+  .out.pred .olabel{color:var(--warn)}
+  .out.pred pre{background:#fffdf7;border-color:#f0dcc0}
+  code{background:#f0f1f3;border-radius:5px;padding:1px 6px;font-family:Consolas,monospace;font-size:14px}
+  ul,ol{margin:8px 0;padding-left:20px}li{margin:3px 0}.rule{font-weight:700;color:var(--accent)}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}th,td{border:1px solid var(--line);padding:7px 10px;text-align:left}th{background:#fafbfc}
+  .tt{border-bottom:1px dotted var(--accent);cursor:help;position:relative}
+  .tt:hover::after{content:attr(data-tip);position:absolute;left:0;bottom:135%;background:#222;color:#fff;padding:7px 10px;border-radius:6px;font-size:12.5px;font-weight:400;line-height:1.55;white-space:normal;width:max-content;max-width:280px;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  .tt:hover::before{content:'';position:absolute;left:12px;bottom:120%;border:6px solid transparent;border-top-color:#222;z-index:20}
+  footer{color:var(--muted);font-size:13px;margin-top:32px}
+  .layout{display:flex;align-items:flex-start;max-width:1180px;margin:0 auto}
+  .side{position:sticky;top:0;align-self:flex-start;flex:0 0 190px;max-height:100vh;overflow-y:auto;padding:44px 14px 40px;border-right:1px solid var(--line);font-size:13.5px}
+  .side-title{font-weight:700;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;padding-left:8px}
+  .side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .side a:hover{background:var(--code);color:var(--accent)}
+  .side a.act{color:var(--accent);font-weight:600;background:var(--code)}
+  .layout .wrap{margin:0 auto}
+  .src{font-size:13px;color:var(--muted);margin:8px 0 0}.src a{color:var(--accent);text-decoration:none;border-bottom:1px solid #cfe0ff}.src a:hover{border-bottom-color:var(--accent)}
+  .ds{margin:14px 0;border:1px solid var(--line);border-radius:8px;background:#fcfdff}
+  .ds>summary{cursor:pointer;padding:11px 15px;font-weight:700;font-size:14px;color:var(--accent);list-style:none}
+  .ds>summary::-webkit-details-marker{display:none}
+  .ds>summary::before{content:"\25B8  "}
+  .ds[open]>summary::before{content:"\25BE  "}
+  .ds .dsbody{padding:2px 15px 14px}
+  .ds h4{margin:15px 0 4px;font-size:14px;color:var(--ink);border-left:3px solid var(--accent);padding-left:8px}
+  .ds p{margin:4px 0;font-size:14px}
+  .ds table{margin:6px 0;font-size:13.5px}
+  .ds .approach{padding-left:2px;margin:5px 0}
+  .ds .tag2{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:10px;background:var(--code);color:var(--accent);margin-right:6px}
+  @media (max-width:760px){.layout{flex-direction:column}.side{position:static;flex:none;width:100%;max-height:none;border-right:none;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:2px;padding:14px}.side-title{width:100%}}
+  @media print{.side{display:none}.layout{display:block}section{page-break-inside:avoid}.tt{border:none}}
+</style>
+</head>
+<body>
+<div class="layout"><nav class="side"><div class="side-title">목차</div><a href="#concept">개념</a><a href="#data">데이터 해석</a><a href="#s1">1. 로드</a><a href="#s2">2. EDA</a><a href="#s3">3. 표기통일·희소범주</a><a href="#s3i">3-1. 인사이트</a><a href="#s4">4. 인코딩</a><a href="#s5">5. 분할</a><a href="#s6">6. 학습</a><a href="#s7">7. 평가·누수실험</a><a href="#s8">8. 저장</a><a href="#wrap">마무리</a></nav>
+  <div class="wrap">
+  <div class="kicker">실습 상세가이드 · 빅데이터 분석 모델링 · SAMPLE_3 / 01</div>
+  <h1>01. 모델 학습 — 어선 규모(대형) 예측</h1>
+  <p class="sub">공공데이터포털의 어선 검사 데이터로 "이 배가 큰 배인가"를 맞힌다. <b>균형 데이터</b>와 <b>누수(leakage)</b>가 주제다.</p>
+  <p class="meta">대상: 비전공 초보 · 소요: 약 2시간 · 선수: SAMPLE_1·2 · 데이터: 63,647척 · 산출물: ../02/model.pkl</p>
+  <div class="flow"><b>워크플로우</b> — 로드 → EDA → 희소범주 → 타겟분리·인코딩 → 분할(stratify) → 학습 → 평가 → 저장</div>
+
+  <p class="src">데이터 출처: <a href="https://www.data.go.kr/data/15049852/fileData.do" target="_blank" rel="noopener">공공데이터포털 &gt; 어선검사현황 (data.go.kr/data/15049852)</a>
+  &nbsp;|&nbsp; 제공기관 <b>한국해양교통안전공단</b> &nbsp;|&nbsp; 파일 <b>CSV</b> 5.5MB&nbsp;|&nbsp; 라이선스 <b>이용허락범위 제한 없음</b></p>
+  <details class="ds"><summary>데이터셋 자세히 보기 — 컬럼 의미 · 출처 · 접근법 · 활용 방식</summary>
+  <div class="dsbody">
+    <h4>개요</h4>
+    <p>한국해양교통안전공단이 검사한 어선의 제원 기록. <b>어선 1척 = 1행</b>, <b>63,647척</b>이다.</p>
+    <p>이 데이터에는 <b>정답 컬럼이 없다.</b> 그래서 `총톤수`(연속값)를 <b>중앙값 4.5톤</b>으로 잘라 대형/소형 이진 문제로 바꾼다.</p>
+    <h4>컬럼 의미 (10열)</h4><table><tr><th style="width:110px">컬럼</th><th>의미</th><th style="width:170px">실습에서</th></tr>
+    <tr><td>순번</td><td>일련번호</td><td>미사용 — 의미 없는 id</td></tr>
+    <tr><td>구분</td><td>전부 '어선'</td><td>미사용 — 값이 하나뿐</td></tr>
+    <tr><td><b>총톤수</b></td><td>배의 크기(톤). 0.14 ~ 2,180</td><td><b>타겟 원천</b> — 중앙값 초과면 대형</td></tr>
+    <tr><td><b>길이 / 너비 / 깊이</b></td><td>배의 치수(m)</td><td><b>제외 — 누수!</b> 총톤수가 이 값들로 계산된다</td></tr>
+    <tr><td>선질</td><td>FRP / 강 / 알루미늄합금 / 목 (5종)</td><td><b>입력</b></td></tr>
+    <tr><td>용도</td><td>연안복합어업 등 59종</td><td><b>입력</b> — 상위 20 + 기타</td></tr>
+    <tr><td>세부용도</td><td>84종</td><td><b>제외</b> — 용도와 1:1 중복</td></tr>
+    <tr><td>선적항</td><td>450종</td><td><b>입력</b> — 시도만 추출(12종)</td></tr></table>
+    <h4>출처 · 받는 방법</h4>
+    <p><b>공공데이터포털(data.go.kr)</b> → 데이터 <code>15049852</code> → <b>다운로드</b> (로그인 불필요). 인코딩 <b>cp949</b>.</p>
+    <h4>가능한 머신러닝 방식</h4>
+    <p class="approach"><span class="tag2">이진분류</span>대형 여부 — <b>이 단원의 과제</b></p>
+    <p class="approach"><span class="tag2">회귀</span>총톤수를 연속값으로 예측 (치수를 빼야 의미 있음)</p>
+    <p class="approach"><span class="tag2">다중분류</span>선질(재질) 예측</p>
+    <p class="approach"><span class="tag2">군집화</span>용도·선적항으로 어업 형태 세그먼트</p>
+  </div>
+</details>
+  <p class="hint">점선 밑줄 용어에 마우스를 올리면 툴팁 설명이 나옵니다. 각 단계는 코드 → 수행결과 → 결과 설명 순서입니다.</p>
+  <div class="flow" style="border-left:4px solid #d9822b"><b style="color:#d9822b">이 단원의 두 가지 주제</b><br>
+  1. <b>균형 데이터</b> — 앞의 두 샘플은 양성이 3.9% / 1.1% 였지만 여기선 <b>50:50</b>. <b>정확도를 봐도 된다.</b><br>
+  2. <b>누수(leakage)</b> — 길이·너비·깊이를 넣으면 ROC-AUC 가 0.99 로 치솟는다. 왜 그게 잘못인지 7단계에서 실험한다.</div>
+
+  <section id="concept">
+    <h2>핵심 개념 — 정답이 없으면 만든다</h2>
+    <div class="note say"><span class="tag">설명</span>
+      <p>이 데이터에는 "대형이다/아니다" 컬럼이 없다. 대신 <b>총톤수</b>라는 연속값이 있다. 이걸 어딘가에서 잘라 <span class="tt" data-tip="연속값을 기준선으로 나눠 두 덩어리로 만드는 것. 어디서 자르냐에 따라 문제의 성격이 달라진다.">이진 문제로 바꾼다.</span></p>
+      <p><span class="rule">어디서 자르나? 중앙값이다.</span> 중앙값으로 자르면 정의상 <b>정확히 반반</b>이 된다.</p></div>
+    <p class="lead">SAMPLE_1(인명피해)·SAMPLE_2(부적합)는 <b>데이터에 이미 있던 정답</b>을 썼다. 이번엔 <b>우리가 정의한다.</b> 그래서 균형이 맞고, 그래서 정확도가 의미를 갖는다.</p>
+    <div class="note warn"><span class="tag">왜 평균이 아니라 중앙값인가</span>
+      <p>총톤수는 최소 0.14톤, <b>중앙값 4.5톤, 평균 12.0톤</b>, 최대 2,180톤이다. 평균이 중앙값의 2.7배 —
+      <span class="tt" data-tip="소수의 아주 큰 값이 평균을 끌어올리는 분포. 소득·집값·기업 규모 등이 대표적이다.">오른쪽으로 긴 꼬리</span> 분포다.</p>
+      <p><b>평균(12톤)으로 잘랐다면 대형이 20%도 안 됐을 것이다.</b> 균형을 원하면 중앙값이다.</p></div>
+  </section>
+
+  <section id="data">
+    <h2>데이터 해석 — 안에 무엇이 들어 있나</h2>
+    <div class="note say"><span class="tag">설명</span><p>63,647척을 집계한 값이다. <span class="rule">전체 대형 비율은 49.9%</span> — 이보다 높으면 큰 배가 많은 조건이다.</p></div>
+
+    <h3>용도 — 어디서 조업하나</h3>
+    <table><tr><th style="width:170px">용도</th><th style="width:100px">척수</th><th>대형 비율</th></tr>
+    <tr><td><b>근해안강망어업</b></td><td>577</td><td><b>100.0%</b></td></tr>
+    <tr><td><b>근해연승어업</b></td><td>601</td><td><b>100.0%</b></td></tr>
+    <tr><td><b>근해유자망어업</b></td><td>828</td><td><b>100.0%</b></td></tr>
+    <tr><td><b>근해채낚기어업</b></td><td>811</td><td><b>100.0%</b></td></tr>
+    <tr><td><b>근해통발어업</b></td><td>495</td><td><b>100.0%</b></td></tr>
+    <tr><td>연안통발어업</td><td>4,077</td><td>33.7%</td></tr>
+    <tr><td>양식어업</td><td>531</td><td>28.8%</td></tr>
+    <tr><td><b>마을어업</b></td><td>517</td><td><b>19.3%</b></td></tr></table>
+    <div class="note exp"><span class="tag">해석 — 가장 강력한 신호</span>
+      <p><b>"근해"로 시작하는 어업은 전부 100% 대형이다.</b> 예외가 없다. 반대로 <b>마을어업은 19.3%</b>.</p>
+      <p>이유는 상식적이다 — <span class="rule">먼바다로 나가려면 큰 배가 필요하고, 집 앞 바다는 작은 배로 충분하다.</span> 근해(近海)는 이름과 달리 연안보다 먼 바다를 뜻한다.</p>
+      <p>모델은 이 규칙을 배운다. 그래서 <b>용도만 알아도 상당히 맞힌다.</b></p></div>
+
+    <h3>선질 — 무엇으로 만들었나</h3>
+    <table><tr><th style="width:170px">선질</th><th style="width:100px">척수</th><th>대형 비율</th></tr>
+    <tr><td>FRP(강화플라스틱)</td><td>61,076</td><td>48.1%</td></tr>
+    <tr><td><b>강(스틸)</b></td><td>2,064</td><td><b>100.0%</b></td></tr>
+    <tr><td>알루미늄합금</td><td>355</td><td>77.2%</td></tr>
+    <tr><td>목(나무)</td><td>150</td><td>33.3%</td></tr></table>
+    <div class="note exp"><span class="tag">해석</span>
+      <p><b>강철선은 100% 대형이다.</b> 2,064척 전부. 큰 배를 나무나 플라스틱으로 만들 수 없기 때문이다.</p>
+      <p>다만 <b>FRP가 96%(61,076척)</b>를 차지한다. 즉 대부분의 배는 FRP라서 <span class="tt" data-tip="한 값이 96%를 차지하면 그 열은 대부분의 행에서 같은 값이다. 구분하는 데 별 도움이 안 된다.">선질만으로는 구분이 잘 안 된다</span>. 강철선일 때만 확실한 신호다.</p></div>
+
+    <div class="note exp"><span class="tag">이 해석이 실습과 어떻게 연결되나</span>
+      <p><b>대형</b> = <b>강(100%)</b> + <b>근해통발어업(100%)</b> + 경남 → 모델 예측 <b>대형 100%</b></p>
+      <p><b>소형</b> = FRP(48%) + <b>마을어업(19%)</b> + 전남 → 모델 예측 <b>소형 96.6%</b></p>
+      <p class="rule">모델은 이 표의 규칙을 조합해 배운 것이다.</p></div>
+  </section>
+
+  <section id="s1">
+    <h2><span class="n">1</span>라이브러리 &amp; 데이터 로드</h2>
+    <div class="note say"><span class="tag">설명</span><p>CSV 를 읽고 <b>총톤수 중앙값</b>으로 타겟을 만든다.</p></div>
+    <pre>df = pd.read_csv('data/어선검사현황.csv', encoding='cp949')
+df['총톤수'] = pd.to_numeric(df['총톤수'], errors='coerce')
+df = df.dropna(subset=['총톤수'])
+
+TARGET = '대형'
+LABELS = ['소형', '대형']
+MED = df['총톤수'].median()
+df[TARGET] = (df['총톤수'] &gt; MED).astype(int)</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>데이터 크기(행, 열): (63647, 11)
+총톤수 중앙값: 4.5 톤</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p>63,647척, 11열(원본 10 + 방금 만든 <code>대형</code>). <b>중앙값 4.5톤</b>이 기준선이 된다.</p></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="n">2</span>EDA - 데이터 파악</h2>
+    <pre>print(df[TARGET].value_counts())
+print('대형 비율:', round(df[TARGET].mean(), 4))
+print(df['총톤수'].describe())</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>대형
+0    31886
+1    31761
+대형 비율: 0.499
+
+[결측치 개수]
+<span class="trunc">(모든 열 0)</span>
+
+[총톤수 분포]
+count    63647.000000
+mean        12.023993
+std         46.749840
+min          0.140000
+50%          4.500000
+max       2180.000000</pre></div>
+    <div class="note exp"><span class="tag">결과 설명 — 앞의 두 샘플과 결정적으로 다르다</span>
+      <p><b>대형 비율 0.499.</b> 거의 정확히 반반이다. 중앙값으로 나눴으니 당연하다.</p>
+      <p class="rule">그래서 이번엔 정확도를 봐도 된다. SAMPLE_1(3.9%)·SAMPLE_2(1.1%)에서는 "전부 음성"으로 찍어도 96%·99%가 나와 정확도가 무의미했지만, 여기선 찍으면 50%다.</p>
+      <p><b>결측이 하나도 없다.</b> 검사 기록이라 제원이 다 채워져 있다.</p>
+      <p>총톤수 <b>평균 12.02 vs 중앙값 4.50</b>, 최대 2,180톤. 소수의 대형선이 평균을 끌어올린 <b>긴 꼬리</b> 분포 — 중앙값으로 자른 이유다.</p></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="n">3</span>전처리 - 표기 통일 &amp; 희소 범주</h2>
+    <div class="note say"><span class="tag">설명</span><p>이 데이터에는 품질 문제가 <b>두 가지</b> 있다.
+    <b>(1) 표기 불일치</b> — 선적항의 시도가 <code>충남</code>/<code>충청남도</code> 처럼 두 이름으로 섞여 있다.
+    <b>(2) 희소 범주</b> — 용도 59종, 선적항 450종이라 대부분 몇 척뿐이다.</p></div>
+    <pre>df['시도'] = df['선적항'].astype(str).str.split().str[0]
+print('[정제 전] 시도 %d종' % df['시도'].nunique())
+print(df['시도'].value_counts().to_dict())
+
+<span class="cmt"># 표기 불일치 통일 — SAMPLE_2 의 '충남/충청남도' 와 똑같은 문제가 여기에도 있다.
+# 제주는 시도 없이 '제주시'/'서귀포시' 로 시작하므로 '제주도' 로 묶는다.</span>
+PORT = {'경기': '경기도', '부산시': '부산광역시', '울산시': '울산광역시', '인천시': '인천광역시',
+        '충남': '충청남도', '충북': '충청북도', '제주시': '제주도', '서귀포시': '제주도'}
+df['시도'] = df['시도'].replace(PORT)
+print('[정제 후] 시도 %d종' % df['시도'].nunique())
+
+for col, new in [('용도', '용도G'), ('세부용도', '세부G')]:
+    top20 = df[col].value_counts().head(20).index
+    df[new] = np.where(df[col].isin(top20), df[col], '기타')</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>[정제 전] 시도 19종
+{'전남': 19683, '경남': 12285, '충남': 6102, '경북': 5594, '강원': 4034, '부산시': 3331,
+ '전북': 3221, '인천시': 2309, '제주시': 2234, '서귀포시': 1757, '울산시': 1082,
+ '충청남도': 1012, '경기': 910, '충북': 48, '부산광역시': 17, '울산광역시': 13,
+ '인천광역시': 12, '경기도': 2, '충청북도': 1}
+[정제 후] 시도 12종
+
+선질    5종 | 용도 59종 -&gt; 21종 | 세부용도 84종 -&gt; 21종 | 선적항 450종 -&gt; 시도 12종
+결측 행 제거: 63647행 -&gt; 63647행</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+    <p><b>표기 불일치를 찾는 법은 "값을 전부 찍어 보는 것"</b> 뿐이다. 위 출력에서
+    <code>충남</code> 6,102건과 <code>충청남도</code> 1,012건이 <b>따로</b> 잡혀 있는 게 보인다. 같은 지역인데 두 범주다.
+    <code>부산시</code>(3,331)/<code>부산광역시</code>(17) 도 마찬가지다.
+    <span class="rule">그대로 두면 모델이 둘을 별개 지역으로 배운다.</span> → 정식 명칭으로 통일해 <b>19종 → 12종</b>.</p>
+    <p>실제로 이 통일 하나로 <b>ROC-AUC 가 0.7153 → 0.7258</b> 로 올랐다. <b>정제가 성능이 된다.</b></p>
+    <p>이어서 선적항 450종을 <b>시도</b>로 줄인 것은 희소 범주 처리다. "전남 여수시 돌산읍"에서 <b>전남</b>만 뽑았다.
+    세밀함을 잃는 대신 <span class="tt" data-tip="450종이면 각 항구당 평균 140척뿐이다. 12종이면 평균 5,300척 — 통계적으로 안정된다.">배울 수 있는 크기</span>가 된다.</p></div>
+  </section>
+
+    <section id="s3i">
+    <h2><span class="n">3-1</span>인사이트 도출 — 데이터가 말하는 것</h2>
+    <div class="note say"><span class="tag">설명</span><p>정제를 끝냈으니 데이터에게 묻는다.
+    <b>"어떤 배가 큰 배(대형)인가?"</b> 여기서 읽은 것을 7단계에서 모델과 대조한다.</p></div>
+    <pre>BASE = df[TARGET].mean()
+print('전체 대형 비율 : %.2f%%' % (BASE * 100))
+
+for col in ['선질', '용도G', '시도']:
+    t = df.groupby(col)[TARGET].agg(['mean', 'count'])
+    t = t[t['count'] &gt;= 200].sort_values('mean', ascending=False)
+    print('\n[%s]  상위 3 / 하위 2  (200건 이상 범주만)' % col)
+    for name, r in pd.concat([t.head(3), t.tail(2)]).iterrows():
+        print('   %-14s %6.2f%%   n=%6d   기준선의 %4.2f배'
+              % (str(name)[:14], r['mean'] * 100, r['count'], r['mean'] / BASE))</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>전체 대형 비율 : 49.90%   &lt;- 균형 데이터라 기준선이 50% 근처다
+
+[선질]  상위 3 / 하위 2  (200건 이상 범주만)
+   강              100.00%   n=  2064   기준선의 2.00배
+   알루미늄합금          77.18%   n=   355   기준선의 1.55배
+   FRP             48.09%   n= 61076   기준선의 0.96배
+
+[용도G]  상위 3 / 하위 2  (200건 이상 범주만)
+   근해안강망어업        100.00%   n=   577   기준선의 2.00배
+   근해연승어업         100.00%   n=   601   기준선의 2.00배
+   근해유자망어업        100.00%   n=   828   기준선의 2.00배
+   어선              27.38%   n=   683   기준선의 0.55배
+   마을어업            19.34%   n=   517   기준선의 0.39배
+
+[시도]  상위 3 / 하위 2  (200건 이상 범주만)
+   제주도             69.66%   n=  3991   기준선의 1.40배
+   인천광역시           65.92%   n=  2321   기준선의 1.32배
+   충청남도            59.21%   n=  7114   기준선의 1.19배
+   강원              36.22%   n=  4034   기준선의 0.73배
+   울산광역시           33.88%   n=  1095   기준선의 0.68배</pre></div>
+    <div class="note exp"><span class="tag">결과 설명 — 여기가 인사이트다</span>
+    <p><b>1. 선질(재질)이 거의 결정적이다.</b> <code>강</code>(철선) 2,064척은 <b>100.00% 전부 대형</b>이다.
+    <code>알루미늄합금</code> 77.18%, <code>FRP</code>(플라스틱) 48.09%.
+    철로 배를 만든다는 건 큰 배를 만든다는 뜻이다.</p>
+    <p><b>2. 근해 어업은 전부 대형이다.</b> <code>근해안강망어업</code>·<code>근해연승어업</code>·<code>근해유자망어업</code> 모두 <b>100%</b>.
+    반대로 <code>마을어업</code> 19.34%. <span class="rule">먼 바다로 나가려면 배가 커야 한다</span> — 당연하지만 데이터가 증명한다.</p>
+    <p><b>3. 지역차도 있다.</b> <code>제주도</code> 69.66% · <code>인천광역시</code> 65.92% vs <code>울산광역시</code> 33.88%.
+    먼 바다 조업이 많은 지역일수록 대형 비율이 높다.</p>
+    <p>→ 정리하면 <b>"강철로 만든, 근해 어업용, 제주·인천 선적"</b> 이면 대형일 가능성이 매우 높다.</p>
+    <div class="note warn"><span class="tag">주의 — 이건 누수가 아니다</span>
+    <p>1·2번이 100%라고 해서 누수는 아니다. <code>선질</code>·<code>용도</code>는 총톤수를 <b>계산해서 만든 값이 아니라</b>,
+    배를 설계할 때 독립적으로 정해지는 값이다. 누수는 <a href="#s7">7단계</a>에서 다루는
+    <code>길이·너비·깊이</code> 처럼 <b>타겟을 산술적으로 구성하는 값</b>을 말한다.</p></div></div>
+  </section>
+  <section id="s4">
+    <h2><span class="n">4</span>타겟 분리 &amp; 인코딩</h2>
+    <div class="note say"><span class="tag">설명</span><p>글자를 숫자 코드로. <span class="rule">여기서 무엇을 빼는지가 이 단원의 핵심이다.</span></p></div>
+    <pre>CODE = {'선질': 'material', '용도G': 'usage', '세부G': 'usage_sub', '시도': 'port'}
+CATS = list(CODE.keys())
+
+OPTIONS = {}
+for c in CATS:
+    OPTIONS[c] = sorted(df[c].astype(str).unique())
+    df[CODE[c]] = df[c].astype(str).map({v: i for i, v in enumerate(OPTIONS[c])})
+
+FEATURES = [
+    {'name': 'material',  'label': '선질(재질)',   'kind': 'cat', 'options': OPTIONS['선질']},
+    {'name': 'usage',     'label': '용도',        'kind': 'cat', 'options': OPTIONS['용도G']},
+    {'name': 'usage_sub', 'label': '세부용도',     'kind': 'cat', 'options': OPTIONS['세부G']},
+    {'name': 'port',      'label': '선적항(시도)',  'kind': 'cat', 'options': OPTIONS['시도']},
+]</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>입력 X: (63647, 3) | 정답 y: (63647,)</pre></div>
+    <div class="note warn"><span class="tag">중급 포인트 — 세부용도를 왜 뺐나 (중복 피처)</span>
+      <p><code>용도</code>와 <code>세부용도</code>를 비교하면 <b>21종 중 16종이 1:1로 대응</b>한다 — <code>근해안강망어업</code>은 항상 <code>어선(근해안강망어업)</code>이다.</p>
+      <p><span class="rule">같은 정보를 두 번 넣는 것</span>이라 모델에 도움이 안 되고 입력 화면만 복잡해진다. 실제로 빼도 ROC-AUC 는 0.7222 → 0.7258 로 거의 그대로다.</p>
+      <p><span class="tt" data-tip="두 열이 거의 같은 정보를 담고 있는 상태. 트리 모델은 큰 문제가 없지만, 화면과 코드가 불필요하게 복잡해진다.">중복 피처</span>는 EDA·인코딩 단계에서 찾아 정리한다.</p></div>
+    <div class="note warn"><span class="tag">중급 포인트 — 길이·너비·깊이를 왜 뺐나</span>
+      <p>이 데이터에는 <code>길이</code>·<code>너비</code>·<code>깊이</code> 라는 <b>좋아 보이는 수치</b>가 있다. 결측도 없다. 그런데 <b>입력에 넣지 않았다.</b></p>
+      <p>이유: <span class="rule">총톤수는 이 치수들로 계산되는 값이다.</span> 배가 길고 넓고 깊으면 톤수가 크다. 즉 치수를 넣는 것은 <b>정답을 살짝 바꿔서 입력에 넣는 것</b>과 같다.</p>
+      <p>7단계에서 <b>일부러 넣어 보고</b> 무슨 일이 벌어지는지 확인한다.</p>
+      <p>남긴 3개는 <b>배를 실측하지 않고도 알 수 있는 정보</b>뿐이다 — 재질·용도·선적항.</p></div>
+  </section>
+
+  <section id="s5">
+    <h2><span class="n">5</span>검증 데이터 분할</h2>
+    <pre>X_tr, X_te, y_tr, y_te = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y)</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>학습: (50917, 3) | 검증: (12730, 3)
+학습 대형 비율: 0.499 | 검증 대형 비율: 0.499</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p>균형 데이터라 <code>stratify</code> 가 없어도 큰 문제는 없지만 <b>습관을 들인다.</b> 양쪽 다 0.499로 유지됐다.</p></div>
+  </section>
+
+  <section id="s6">
+    <h2><span class="n">6</span>모델 학습</h2>
+    <div class="note say"><span class="tag">설명</span><p><b><code>class_weight='balanced'</code> 를 쓰지 않는다.</b></p></div>
+    <pre>model = RandomForestClassifier(n_estimators=100, max_depth=8, random_state=42, n_jobs=-1)
+model.fit(X_tr, y_tr)</pre>
+    <div class="note exp"><span class="tag">결과 설명 — 처방은 데이터를 보고 정한다</span>
+      <p>SAMPLE_1·2 에서는 <code>class_weight='balanced'</code> 가 <b>필수</b>였다. 안 쓰면 모델이 "전부 음성"이라 답했으니까.</p>
+      <p>여기선 <b>쓸 이유가 없다.</b> 이미 50:50 이라 모델이 한쪽으로 치우칠 이유가 없다. 억지로 쓰면 오히려 왜곡된다.</p>
+      <p class="rule">배운 기법을 항상 쓰는 게 아니다. 2단계에서 본 것(균형)에 따라 처방이 달라진다.</p></div>
+  </section>
+
+  <section id="s7">
+    <h2><span class="n">7</span>평가 - 균형 데이터에서는 정확도가 의미 있다</h2>
+    <pre>pred  = model.predict(X_te)
+proba = model.predict_proba(X_te)[:, 1]
+acc = accuracy_score(y_te, pred)
+auc = roc_auc_score(y_te, proba)</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>정확도(Accuracy): 0.6548
+  찍었을 때(균형이라) : 0.5   <span class="cmt">&lt;- 이번엔 기준선이 0.5 다</span>
+ROC-AUC        : 0.7258
+
+              precision    recall  f1-score   support
+
+          소형       0.60      0.85      0.71      6378
+          대형       0.75      0.43      0.55      6352
+
+    accuracy                           0.64     12730</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p><b>정확도 0.6548 는 찍기(0.5)보다 확실히 높다.</b> 균형 데이터라 이 비교가 성립한다. <span class="rule">SAMPLE_1에서 정확도 0.96이 무의미했던 것과 비교해 보라 — 같은 지표라도 데이터에 따라 의미가 완전히 달라진다.</span></p>
+      <p>대형의 <b>precision 0.75 / recall 0.43</b> — 대형이라 하면 잘 맞지만(75%), 실제 대형의 43%만 잡는다. 모델이 <b>보수적</b>이다. 근해어업·강철선처럼 확실한 신호가 있을 때만 대형이라 답하기 때문이다.</p></div>
+
+    <h3>7-1. 누수 실험 — 길이·너비·깊이를 넣으면?</h3>
+    <div class="note say"><span class="tag">설명</span><p>4단계에서 뺐던 치수를 <b>일부러 넣어</b> 학습해 본다. <span class="rule">이 단원에서 가장 중요한 실험이다.</span></p></div>
+    <pre>LEAK_F = [f['name'] for f in FEATURES] + ['길이', '너비', '깊이']
+leak = RandomForestClassifier(n_estimators=100, max_depth=8, random_state=42, n_jobs=-1)
+leak.fit(Xl_tr, yl_tr)
+<span class="cmt"># ... 두 모델 비교 + 특성 중요도 출력</span></pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>                                  치수 제외      치수 포함
+정확도                              0.6548     0.9831
+ROC-AUC                          0.7258     0.9987
+
+[치수 포함 모델이 무엇을 보고 있나 - 특성 중요도]
+길이          0.545
+너비          0.334
+깊이          0.092
+usage       0.021
+port        0.005
+material    0.002</pre></div>
+    <div class="note warn"><span class="tag">결과 설명 — 이 단원에서 꼭 가져갈 것</span>
+      <p>치수를 넣으니 <b>ROC-AUC 가 0.72 → 0.9987</b>, 정확도 0.98. <b>거의 완벽하다.</b> 기뻐해야 할까?</p>
+      <p><b>아니다. 이 모델은 쓸모가 없다.</b> 특성 중요도를 보라 — <span class="rule">길이·너비·깊이가 97.1%(0.545+0.334+0.092)</span>를 차지한다. 재질·용도는 <b>거들떠보지도 않는다</b>(합쳐서 3.3%).</p>
+      <p>왜냐하면 <b>총톤수 = 길이 × 너비 × 깊이 × 계수</b> 이기 때문이다. 모델은 어업을 배운 게 아니라 <span class="tt" data-tip="총톤수는 배의 용적을 나타내는 값으로, 치수에서 계산된다. 모델은 그 계산식을 근사한 것뿐이다.">부피 공식을 다시 계산한 것</span>뿐이다.</p>
+      <p><b>현실에서 쓸 수 있나?</b> 길이·너비·깊이를 재려면 이미 배를 실측한 것이고, 그럼 <b>총톤수도 바로 나온다.</b> 예측할 필요가 없는 값을 예측하는 셈이다.</p>
+      <p class="rule">교훈: 성능이 갑자기 너무 좋으면 기뻐하기 전에 의심하라. 십중팔구 정답이 입력에 섞여 있다.</p></div>
+  </section>
+
+  <section id="s8">
+    <h2><span class="n">8</span>모델 저장</h2>
+    <div class="note say"><span class="tag">설명</span><p><b>치수를 뺀 정상 모델</b>을 저장한다. 누수 모델은 실험용이라 버린다.</p></div>
+    <pre>joblib.dump(model, '../02/model.pkl')          <span class="cmt"># &lt;- leak 이 아니라 model 을 저장한다</span>
+json.dump(spec, open('../02/feature_spec.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>저장 완료: ../02/model.pkl, ../02/feature_spec.json
+
+--- 이 model.pkl 을 만든 환경 ---
+python      : 3.11.0
+numpy       : 2.4.6
+pandas      : 3.0.3
+scikit-learn: 1.9.0
+joblib      : 1.5.3</pre></div>
+    <div class="note warn"><span class="tag">주의</span><p><code>leak</code> 이 아니라 <code>model</code> 을 저장한다. 성능 숫자만 보면 leak 이 좋아 보이지만 <b>현실에서 못 쓰는 모델</b>이다.</p></div>
+  </section>
+
+  <section id="wrap">
+    <h2>마무리 &amp; 다음</h2>
+    <h3>SAMPLE_3 에서 꼭 가져갈 것</h3>
+    <ol>
+      <li><b>정답이 없으면 만든다.</b> 연속값(총톤수)을 잘라 이진 문제로. <b>평균이 아니라 중앙값</b> — 분포가 한쪽으로 길기 때문.</li>
+      <li><b>균형 데이터에서는 정확도가 의미 있다.</b> 기준선이 0.5. SAMPLE_1·2 와 정반대다.</li>
+      <li><b>class_weight 는 만능이 아니다.</b> 균형이면 쓸 이유가 없다. <b>처방은 데이터를 보고 정한다.</b></li>
+      <li><b>성능이 너무 좋으면 의심하라.</b> 치수를 넣으니 AUC 0.9987 — 정답을 다시 계산한 것뿐이었다.</li>
+    </ol>
+    <h3>세 샘플 비교 — 이게 이 과정의 결론이다</h3>
+    <table><tr><th></th><th>SAMPLE_1 화재</th><th>SAMPLE_2 중금속</th><th>SAMPLE_3 어선</th></tr>
+    <tr><td>양성 비율</td><td>3.9%</td><td>1.1%</td><td><b>49.9%</b></td></tr>
+    <tr><td>타겟</td><td>실재(인명피해)</td><td>실재(부적합)</td><td><b>파생(중앙값)</b></td></tr>
+    <tr><td>결측</td><td>없음</td><td>재배면적 29%</td><td>없음</td></tr>
+    <tr><td>정제</td><td>불필요</td><td>표기 통일·희소범주</td><td>희소범주</td></tr>
+    <tr><td>class_weight</td><td>필수</td><td>필수</td><td><b>불필요</b></td></tr>
+    <tr><td>정확도</td><td>무의미(0.96 착시)</td><td>무의미(0.99 착시)</td><td><b>유효(0.6548 vs 0.5)</b></td></tr>
+    <tr><td>ROC-AUC</td><td>0.7131</td><td>0.8147</td><td>0.7258</td></tr>
+    <tr><td>주제</td><td>불균형</td><td>정제·결측</td><td><b>누수</b></td></tr></table>
+    <div class="note exp"><span class="tag">세 샘플을 관통하는 것</span><p>같은 8단계 뼈대에 데이터만 바꿔 넣었다. 그런데 <b>매번 다른 처방</b>이 나왔다. <span class="rule">기법을 외우는 게 아니라, 2단계(EDA)에서 데이터를 보고 무엇이 필요한지 판단하는 것</span> — 그게 이 과정의 핵심이다.</p></div>
+    <h3>자주 막히는 곳</h3>
+    <table><tr><th>증상</th><th>해결</th></tr>
+    <tr><td>UnicodeDecodeError</td><td><code>encoding='cp949'</code> 확인</td></tr>
+    <tr><td>그래프 한글이 □</td><td>1단계 <code>font.family = 'Malgun Gothic'</code> 확인</td></tr>
+    <tr><td>AUC가 0.99가 나온다</td><td>치수(길이·너비·깊이)가 입력에 들어갔는지 확인 — 7-1 실험 모델이다</td></tr>
+    <tr><td>8단계에서 leak을 저장</td><td><code>joblib.dump(model, ...)</code> 인지 확인 (leak 아님)</td></tr></table>
+    <p class="lead">다음: <b>02. ML API</b> — 저장한 model.pkl 을 FastAPI(<b>포트 8003</b>)로 서비스합니다.</p>
+  </section>
+
+  <footer>빅데이터 분석 모델링 · SAMPLE_3 / 01 모델 학습 상세가이드 · 노트북: 모델학습.ipynb</footer>
+</div>
+</div>
+<script>
+(function(){var L=[].slice.call(document.querySelectorAll('.side a[href^="#"]'));var M={};L.forEach(function(a){var s=document.getElementById(a.getAttribute('href').slice(1));if(s)M[a.getAttribute('href').slice(1)]=a;});var ids=Object.keys(M);function f(){var cur=null;ids.forEach(function(id){if(document.getElementById(id).getBoundingClientRect().top<=120)cur=id;});L.forEach(function(a){a.classList.remove('act');});if(cur)M[cur].classList.add('act');}document.addEventListener('scroll',f,{passive:true});window.addEventListener('load',f);f();})();
+</script>
+</body>
+</html>

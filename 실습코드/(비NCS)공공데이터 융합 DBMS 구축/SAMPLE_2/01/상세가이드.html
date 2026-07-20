@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMPLE_2 / 01 모델 학습 - 상세가이드</title>
+<style>
+  :root{ --ink:#222; --muted:#777; --line:#eaeaea; --accent:#2f6feb; --do:#1a9e6a; --code:#f5f6f8; --out:#f2f8f4; --out-b:#cfe6d8; --warn:#d9822b; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic",sans-serif;line-height:1.75;font-size:16px}
+  .wrap{max-width:840px;margin:0 auto;padding:44px 22px 90px}
+  .kicker{color:var(--accent);font-weight:600;font-size:13px}
+  h1{margin:8px 0 6px;font-size:26px;font-weight:700}.sub{color:var(--muted);margin:0 0 12px}.meta{color:var(--muted);font-size:14px;margin:0 0 4px}
+  .flow{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px 15px;margin:14px 0;font-size:14px;color:#444}.flow b{color:var(--accent)}
+  .hint{font-size:13px;color:var(--muted);margin:8px 0 0}
+  section{padding:26px 0;border-bottom:1px solid var(--line)}section:last-of-type{border-bottom:none}
+  h2{margin:0 0 4px;font-size:19px;font-weight:700}h2 .n{color:var(--accent);margin-right:8px}h3{margin:18px 0 4px;font-size:16px}
+  .lead{color:var(--muted);margin:2px 0 10px}
+  .note{margin:12px 0;padding-left:14px;border-left:3px solid var(--line)}.note .tag{font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase}
+  .note.do{border-left-color:var(--do)}.note.do .tag{color:var(--do)}.note.say{border-left-color:var(--accent)}.note.say .tag{color:var(--accent)}
+  .note.exp{border-left-color:var(--do);background:#fbfefc}.note.exp .tag{color:var(--do)}.note p{margin:3px 0}
+  .note.warn{border-left-color:var(--warn);background:#fffdf7}.note.warn .tag{color:var(--warn)}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:13px 15px;overflow:auto;font-family:Consolas,"D2Coding",monospace;font-size:13.5px;line-height:1.6;margin:12px 0;color:#1b1f24}pre .cmt{color:#9aa0a6}
+  .out{margin:10px 0}
+  .out .olabel{font-size:12px;font-weight:700;color:var(--do);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px}
+  .out pre{background:var(--out);border:1px solid var(--out-b);color:#123}
+  .out pre .trunc{color:#9aa0a6}
+  .out.pred .olabel{color:var(--warn)}
+  .out.pred pre{background:#fffdf7;border-color:#f0dcc0}
+  code{background:#f0f1f3;border-radius:5px;padding:1px 6px;font-family:Consolas,monospace;font-size:14px}
+  ul,ol{margin:8px 0;padding-left:20px}li{margin:3px 0}.rule{font-weight:700;color:var(--accent)}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}th,td{border:1px solid var(--line);padding:7px 10px;text-align:left}th{background:#fafbfc}
+  .tt{border-bottom:1px dotted var(--accent);cursor:help;position:relative}
+  .tt:hover::after{content:attr(data-tip);position:absolute;left:0;bottom:135%;background:#222;color:#fff;padding:7px 10px;border-radius:6px;font-size:12.5px;font-weight:400;line-height:1.55;white-space:normal;width:max-content;max-width:280px;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  .tt:hover::before{content:'';position:absolute;left:12px;bottom:120%;border:6px solid transparent;border-top-color:#222;z-index:20}
+  footer{color:var(--muted);font-size:13px;margin-top:32px}
+  .layout{display:flex;align-items:flex-start;max-width:1180px;margin:0 auto}
+  .side{position:sticky;top:0;align-self:flex-start;flex:0 0 190px;max-height:100vh;overflow-y:auto;padding:44px 14px 40px;border-right:1px solid var(--line);font-size:13.5px}
+  .side-title{font-weight:700;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;padding-left:8px}
+  .side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .side a:hover{background:var(--code);color:var(--accent)}
+  .side a.act{color:var(--accent);font-weight:600;background:var(--code)}
+  .layout .wrap{margin:0 auto}
+  .src{font-size:13px;color:var(--muted);margin:8px 0 0}.src a{color:var(--accent);text-decoration:none;border-bottom:1px solid #cfe0ff}.src a:hover{border-bottom-color:var(--accent)}
+  .ds{margin:14px 0;border:1px solid var(--line);border-radius:8px;background:#fcfdff}
+  .ds>summary{cursor:pointer;padding:11px 15px;font-weight:700;font-size:14px;color:var(--accent);list-style:none}
+  .ds>summary::-webkit-details-marker{display:none}
+  .ds>summary::before{content:"\25B8  "}
+  .ds[open]>summary::before{content:"\25BE  "}
+  .ds .dsbody{padding:2px 15px 14px}
+  .ds h4{margin:15px 0 4px;font-size:14px;color:var(--ink);border-left:3px solid var(--accent);padding-left:8px}
+  .ds p{margin:4px 0;font-size:14px}
+  .ds table{margin:6px 0;font-size:13.5px}
+  .ds .approach{padding-left:2px;margin:5px 0}
+  .ds .tag2{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:10px;background:var(--code);color:var(--accent);margin-right:6px}
+  @media (max-width:760px){.layout{flex-direction:column}.side{position:static;flex:none;width:100%;max-height:none;border-right:none;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:2px;padding:14px}.side-title{width:100%}}
+  @media print{.side{display:none}.layout{display:block}section{page-break-inside:avoid}.tt{border:none}}
+</style>
+</head>
+<body>
+<div class="layout"><nav class="side"><div class="side-title">목차</div><a href="#concept">개념</a><a href="#data">데이터 해석</a><a href="#s1">1. 로드</a><a href="#s2">2. EDA</a><a href="#s3">3. 정제·결측</a><a href="#s3i">3-1. 인사이트</a><a href="#s4">4. 인코딩</a><a href="#s5">5. 분할·결측채우기</a><a href="#s6">6. 학습</a><a href="#s7">7. 평가</a><a href="#s8">8. 저장</a><a href="#wrap">마무리</a></nav>
+  <div class="wrap">
+  <div class="kicker">실습 상세가이드 · 빅데이터 분석 모델링 · SAMPLE_2 / 01</div>
+  <h1>01. 모델 학습 — 농산물 중금속 부적합 예측</h1>
+  <p class="sub">공공데이터포털의 농산물 검사 데이터로 "이 검사에서 부적합이 나올까"를 맞힌다. SAMPLE_1과 달리 <b>데이터가 지저분해서 전처리가 주제</b>다.</p>
+  <p class="meta">대상: 비전공 초보 · 소요: 약 2시간 · 선수: SAMPLE_1 · 데이터: 68,106건 · 산출물: ../02/model.pkl</p>
+  <div class="flow"><b>워크플로우</b> — 로드 → EDA → <b>정제·희소범주</b> → 타겟분리·인코딩 → <b>분할 후 결측 채우기</b> → 학습 → 평가(ROC-AUC) → 저장</div>
+
+  <p class="src">데이터 출처: <a href="https://www.data.go.kr/data/15047544/fileData.do" target="_blank" rel="noopener">공공데이터포털 &gt; 농산물 중금속 분석결과 (data.go.kr/data/15047544)</a>
+  &nbsp;|&nbsp; 제공기관 <b>농림축산식품부 국립농산물품질관리원</b> &nbsp;|&nbsp; 파일 <b>CSV</b> 4MB&nbsp;|&nbsp; 라이선스 <b>이용허락범위 제한 없음</b></p>
+  <details class="ds"><summary>데이터셋 자세히 보기 — 컬럼 의미 · 출처 · 접근법 · 활용 방식</summary>
+  <div class="dsbody">
+    <h4>개요</h4>
+    <p>국립농산물품질관리원이 시중·산지의 농산물을 수거해 <b>중금속(납·카드뮴 등)</b> 함량을 분석한 기록. <b>검사 1건 = 1행</b>, 2006~2020년 <b>68,106건</b>이다.</p>
+    <p>이 중 <b>부적합은 761건(1.12%)</b> — 적합 67,345건. SAMPLE_1(화재 3.9%)보다 더 심한 불균형이다.</p>
+    <h4>컬럼 의미 (8열)</h4><table><tr><th style="width:120px">컬럼</th><th>의미</th><th style="width:150px">실습에서</th></tr>
+    <tr><td>품목명</td><td>검사한 농산물 (518종)</td><td><b>입력</b> — 상위 30 + 기타로 묶음</td></tr>
+    <tr><td>수거단계</td><td>생산 / 유통·판매 / 출하 / 저장</td><td><b>입력</b></td></tr>
+    <tr><td>재배양식</td><td>일반 / GAP / 친환경(유기·무농약) 등 12종</td><td><b>입력</b> — 상위 5 + 기타</td></tr>
+    <tr><td>생산자 주소</td><td>생산지 (469종)</td><td><b>입력</b> — 시도만 추출 후 <b>표기 통일</b></td></tr>
+    <tr><td>재배면적</td><td>재배 면적(㎡). <b>결측 29%</b></td><td><b>입력</b> — 분할 후 학습 중앙값으로 채움</td></tr>
+    <tr><td>조사물량</td><td>조사 물량(kg). <b>결측 19%</b></td><td><b>입력</b> — 동일</td></tr>
+    <tr><td>등록일자</td><td>검사 등록일 (YYYYMMDD)</td><td><b>입력</b> — 월만 사용</td></tr>
+    <tr><td>분석결과</td><td>적합 / 부적합(폐기) / 부적합(회수폐기·재조사)</td><td><b>타겟</b> — 적합=0, 부적합=1</td></tr></table>
+    <h4>출처 · 받는 방법</h4>
+    <p><b>공공데이터포털(data.go.kr)</b> → 데이터 <code>15047544</code> → <b>다운로드</b> (로그인 불필요). 인코딩 <b>cp949</b>.</p>
+    <h4>가능한 머신러닝 방식</h4>
+    <p class="approach"><span class="tag2">이진분류</span>부적합 여부 — <b>이 단원의 과제</b></p>
+    <p class="approach"><span class="tag2">회귀</span>재배면적·조사물량 예측</p>
+    <p class="approach"><span class="tag2">다중분류</span>수거단계(4종) 예측</p>
+    <p class="approach"><span class="tag2">군집화</span>품목·지역·재배양식으로 농가 세그먼트 나누기</p>
+  </div>
+</details>
+  <p class="hint">점선 밑줄 용어에 마우스를 올리면 툴팁 설명이 나옵니다. 각 단계는 코드 → 수행결과 → 결과 설명 순서입니다.</p>
+  <div class="flow" style="border-left:4px solid #d9822b"><b style="color:#d9822b">SAMPLE_1과 무엇이 다른가</b> — SAMPLE_1은 데이터가 깨끗했다(결측 0). 이 데이터는 <b>같은 지역이 두 이름</b>으로 있고, <b>품목이 518종</b>이며, <b>재배면적 29%가 비어</b> 있다. <b>전처리(3·5단계)가 이 단원의 주제다.</b></div>
+
+  <section id="concept">
+    <h2>핵심 개념 — 전처리는 왜 중요한가</h2>
+    <div class="note say"><span class="tag">설명</span>
+      <p>모델은 <b>준 대로 배운다.</b> `충남`과 `충청남도`를 따로 주면 <span class="rule">모델은 두 개의 다른 지역이라고 배운다.</span> 같은 지역의 데이터가 반으로 쪼개져 둘 다 제대로 못 배운다.</p>
+      <p>실무 데이터는 여러 해에 걸쳐 여러 사람이 입력한다. 표기가 흔들리는 게 정상이다. <b>정제는 선택이 아니라 필수다.</b></p></div>
+    <p class="lead">이 단원에서 다루는 세 가지 지저분함: <b>표기 불일치</b>(충남/충청남도) · <b>희소 범주</b>(518종 중 대부분이 몇 건) · <b>결측</b>(재배면적 29%).</p>
+  </section>
+
+  <section id="data">
+    <h2>데이터 해석 — 안에 무엇이 들어 있나</h2>
+    <div class="note say"><span class="tag">설명</span><p>아래는 68,106건을 직접 집계한 값이다. <span class="rule">전체 부적합률은 1.12%</span> — 이보다 높으면 위험 신호다.</p></div>
+
+    <h3>수거단계 — 언제 걸리나</h3>
+    <table><tr><th style="width:150px">값</th><th style="width:110px">건수</th><th>부적합률</th></tr>
+    <tr><td><b>생산</b></td><td>48,183</td><td><b>1.55%</b></td></tr>
+    <tr><td>유통/판매</td><td>19,815</td><td><b>0.06%</b></td></tr>
+    <tr><td>출하 / 저장</td><td>108</td><td>0.00%</td></tr></table>
+    <div class="note exp"><span class="tag">해석 — 가장 중요한 신호</span>
+      <p><b>생산 단계 1.55% vs 유통/판매 0.06% — 25배 차이</b>다. 왜일까? <span class="rule">생산 단계에서 걸러내기 때문에 유통까지 못 간다.</span> 검사 체계가 작동하고 있다는 뜻이다.</p>
+      <p>모델 입장에서 <b>수거단계는 가장 강력한 힌트</b>가 된다.</p></div>
+
+    <h3>재배양식 — 인증이 의미가 있나</h3>
+    <table><tr><th style="width:190px">값</th><th style="width:110px">건수</th><th>부적합률</th></tr>
+    <tr><td>일반</td><td>65,124</td><td><b>1.17%</b></td></tr>
+    <tr><td>친환경(인증) 무농약</td><td>1,643</td><td><b>0.00%</b></td></tr>
+    <tr><td>직불제(쌀소득)</td><td>532</td><td>0.00%</td></tr>
+    <tr><td>GAP(인증)</td><td>355</td><td>0.28%</td></tr>
+    <tr><td>친환경(인증) 유기</td><td>260</td><td>0.00%</td></tr></table>
+    <div class="note exp"><span class="tag">해석</span>
+      <p><b>인증 농산물에서는 부적합이 사실상 나오지 않는다.</b> 친환경 무농약 1,643건 중 0건, 유기 260건 중 0건.</p>
+      <p>다만 조심할 것 — 인증 농산물은 <span class="tt" data-tip="인증을 받으려면 이미 까다로운 관리를 거친다. 즉 '인증이라서 안전한' 것인지 '원래 관리가 잘 되는 농가가 인증을 받는' 것인지는 이 데이터만으로 알 수 없다.">애초에 관리가 잘 되는 농가</span>가 받는다. 상관관계이지 인과관계라 단정할 수 없다.</p></div>
+
+    <h3>품목 — 무엇이 위험한가 (상위 12)</h3>
+    <table><tr><th style="width:150px">품목</th><th style="width:110px">건수</th><th>부적합률</th></tr>
+    <tr><td><b>백태(콩)</b></td><td>1,241</td><td><b>3.63%</b></td></tr>
+    <tr><td>멥쌀(일반)</td><td>16,084</td><td><b>2.08%</b></td></tr>
+    <tr><td>현미</td><td>12,121</td><td><b>1.89%</b></td></tr>
+    <tr><td>대파</td><td>1,161</td><td>1.29%</td></tr>
+    <tr><td>일반부추</td><td>1,294</td><td>0.62%</td></tr>
+    <tr><td>홍고추</td><td>2,005</td><td>0.50%</td></tr>
+    <tr><td>수미(감자)</td><td>1,452</td><td>0.41%</td></tr>
+    <tr><td>시금치 / 밤고구마</td><td>2,492</td><td>0.32%</td></tr>
+    <tr><td>풋고추</td><td>1,310</td><td>0.08%</td></tr>
+    <tr><td>찰옥수수 / 여름무</td><td>2,000</td><td>0.00%</td></tr></table>
+    <div class="note exp"><span class="tag">해석</span>
+      <p><b>쌀·콩류가 위험하다.</b> 백태 3.63%(평균의 3배), 멥쌀 2.08%, 현미 1.89%. <span class="tt" data-tip="벼·콩은 토양에서 자라며 뿌리로 흡수한다. 토양이 오염되면 그대로 축적된다.">토양의 중금속을 흡수해 축적</span>하기 때문으로 볼 수 있다.</p>
+      <p>반면 잎채소(시금치 0.32%)나 열매채소(풋고추 0.08%)는 낮다.</p>
+      <p><b>건수가 곧 위험이 아니다.</b> 멥쌀은 16,084건으로 가장 많이 검사받았는데, 그건 주식이라 많이 검사한 것이지 위험해서가 아니다.</p></div>
+
+    <h3>생산지 — 여기서 문제가 발견된다</h3>
+    <table><tr><th style="width:150px">시도</th><th style="width:110px">건수</th><th>부적합률</th></tr>
+    <tr><td><b>충남</b></td><td>5,933</td><td>2.11%</td></tr>
+    <tr><td><b>경북</b></td><td>5,932</td><td>1.82%</td></tr>
+    <tr><td><b>경상북도</b></td><td>5,671</td><td>0.86%</td></tr>
+    <tr><td><b>충청남도</b></td><td>5,316</td><td>0.81%</td></tr>
+    <tr><td>경남 / 경상남도</td><td>4,361 / 4,025</td><td>0.89% / 0.37%</td></tr></table>
+    <div class="note warn"><span class="tag">이상하지 않은가?</span>
+      <p><b>충남과 충청남도가 따로 있다.</b> 경북과 경상북도도 마찬가지. <span class="rule">같은 지역인데 표기가 달라서 두 줄로 나뉜 것이다.</span></p>
+      <p>부적합률까지 다르게 나온다(2.11% vs 0.81%). 오래된 기록은 축약형으로, 최근 기록은 정식 명칭으로 입력했을 가능성이 크다. <b>이대로 학습하면 모델은 충남과 충청남도를 다른 지역으로 배운다.</b></p>
+      <p>3단계에서 이걸 통일한다. <b>정제 후 33종 → 17종</b>이 된다.</p></div>
+
+    <div class="note exp"><span class="tag">이 해석이 실습과 어떻게 연결되나</span>
+      <p><b>부적합 위험</b> = 멥쌀(2.08%) + <b>생산 단계(1.55%)</b> + 일반 재배(1.17%) + 경상북도 → 모델 예측 <b>부적합 50.6%</b></p>
+      <p><b>적합</b> = 기타 품목 + <b>유통/판매(0.06%)</b> + <b>친환경 무농약(0.00%)</b> + 경기도 → 모델 예측 <b>적합 99.2%</b></p>
+      <p class="rule">모델은 이 표들의 규칙을 조합해 배운 것이다.</p></div>
+  </section>
+
+  <section id="s1">
+    <h2><span class="n">1</span>라이브러리 &amp; 데이터 로드</h2>
+    <div class="note say"><span class="tag">설명</span><p><code>분석결과</code> 열에 <b>이미 판정이 들어 있다.</b> SAMPLE_1처럼 만들 필요 없이 그대로 이진 타겟으로 바꾼다.</p></div>
+    <pre>df = pd.read_csv('data/농산물_중금속_분석결과.csv', encoding='cp949')
+
+TARGET = '부적합'
+LABELS = ['적합', '부적합']
+df[TARGET] = (~df['분석결과'].astype(str).str.startswith('적합')).astype(int)</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>데이터 크기(행, 열): (68106, 9)
+분석결과
+적합                       67345
+부적합 (폐기)                   749
+부적합(회수폐기 및 생산 단계 재조사)       12</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p>부적합이 <b>두 종류</b>(폐기 / 회수폐기·재조사)로 나뉘어 있다. 우리는 <b>부적합이냐 아니냐</b>만 보면 되므로 <code>startswith('적합')</code> 으로 한 번에 묶었다.</p>
+      <p><span class="tt" data-tip="~ 는 부정(NOT). '적합으로 시작하지 않으면 True' 즉 부적합.">물결표(~)</span>가 조건을 뒤집는다.</p></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="n">2</span>EDA - 데이터 파악</h2>
+    <div class="note say"><span class="tag">설명</span><p>타겟·결측과 함께 <b>범주형 열의 고유값 개수</b>를 꼭 본다. 여기서 518종이 드러난다.</p></div>
+    <pre>print(df[TARGET].value_counts())
+print(df.isnull().sum())
+for c in ['품목명', '수거단계', '재배양식', '생산자 주소']:
+    print('  %-10s %5d종' % (c, df[c].nunique()))</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>부적합
+0    67345
+1      761
+부적합 비율: 0.0112
+
+[결측치 개수]
+재배면적      19932
+조사물량      12975
+<span class="trunc">(나머지 열은 0)</span>
+
+[범주형 열의 고유값 개수]
+  품목명          518종
+  수거단계           4종
+  재배양식          12종
+  생산자 주소       469종</pre></div>
+    <div class="note exp"><span class="tag">결과 설명 — 세 가지 문제</span>
+      <p>1. <b>부적합 1.12%</b> — 극심한 불균형. 전부 "적합"이라 찍어도 98.9%다.</p>
+      <p>2. <b>품목명 518종</b> — 대부분 몇 건뿐인 <span class="tt" data-tip="특정 값이 아주 드물게 나타나는 범주. 모델이 그 값에 대해 배울 데이터가 부족하다.">희소 범주</span>다.</p>
+      <p>3. <b>결측 재배면적 19,932건(29%)</b>, 조사물량 12,975건(19%).</p>
+      <p>SAMPLE_1은 결측이 0이라 그냥 넘어갔다. 여기서는 <b>진짜로 처리해야 한다.</b></p></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="n">3</span>전처리 - 데이터 정제 &amp; 희소범주</h2>
+    <div class="note say"><span class="tag">설명</span><p><span class="rule">이 단계가 SAMPLE_2의 핵심이다.</span> 먼저 시도를 뽑아 상태를 확인한다.</p></div>
+    <pre>df['시도'] = df['생산자 주소'].astype(str).str.split().str[0]
+print('[정제 전] 시도 %d종' % df['시도'].nunique())
+print(df['시도'].value_counts().head(8).to_dict())</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>[정제 전] 시도 33종
+{'충남': 5933, '경북': 5932, '경상북도': 5671, '충청남도': 5316,
+ '경남': 4361, '전남': 4204, '경상남도': 4025, '강원도': 3934}</pre></div>
+    <div class="note warn"><span class="tag">문제 발견</span>
+      <p><b>충남과 충청남도가 따로, 경북과 경상북도가 따로</b> 잡힌다. 같은 지역인데 표기가 다르다.</p>
+      <p><span class="rule">이대로 학습하면 모델은 이들을 다른 지역으로 배운다.</span> 충남 데이터로 배운 규칙을 충청남도에 적용하지 못한다.</p></div>
+
+    <h3>3-1. 시도 표기 통일</h3>
+    <pre>SIDO = {'충남':'충청남도', '충북':'충청북도', '경남':'경상남도', '경북':'경상북도',
+        '전남':'전라남도', '전북':'전라북도', '강원':'강원도', '경기':'경기도',
+        '제주':'제주특별자치도', '서울':'서울특별시', '부산':'부산광역시', '대구':'대구광역시',
+        '인천':'인천광역시', '광주':'광주광역시', '대전':'대전광역시', '울산':'울산광역시',
+        '세종':'세종특별자치시'}
+df['시도'] = df['시도'].replace(SIDO)
+print('[정제 후] 시도 %d종' % df['시도'].nunique())</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>[정제 후] 시도 17종</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p><b>33종 → 17종.</b> 대한민국 시도는 17개니 정확히 맞다. <span class="tt" data-tip="딕셔너리를 넘기면 키에 해당하는 값을 새 값으로 바꾼다. 딕셔너리에 없는 값은 그대로 둔다.">replace(딕셔너리)</span>로 한 번에 바꿨다.</p></div>
+
+    <h3>3-2. 희소 범주 묶기 &amp; 파생</h3>
+    <pre>top30 = df['품목명'].value_counts().head(30).index
+df['품목'] = np.where(df['품목명'].isin(top30), df['품목명'], '기타')
+
+top5 = df['재배양식'].value_counts().head(5).index
+df['양식'] = np.where(df['재배양식'].isin(top5), df['재배양식'], '기타')
+
+df['month'] = pd.to_datetime(df['등록일자'], format='%Y%m%d', errors='coerce').dt.month
+df['area']   = pd.to_numeric(df['재배면적'], errors='coerce')
+df['volume'] = pd.to_numeric(df['조사물량'], errors='coerce')</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>품목: 518종 -&gt; 31종 ('기타' 비중 24.0%)
+결측 행 제거: 68106행 -&gt; 68106행  (면적·물량의 결측은 5단계 뒤에 채운다)</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p><b>상위 30개가 전체의 76%</b>를 덮는다. 나머지 488종을 '기타'로 묶으면 24%다. <span class="rule">30종은 배울 수 있고, 488종은 못 배운다.</span></p>
+      <p><code>np.where(조건, 참일때, 거짓일때)</code> — 상위 30에 들면 원래 이름, 아니면 '기타'.</p></div>
+    <div class="note warn"><span class="tag">중급 포인트 — 왜 결측을 지금 안 채우나</span>
+      <p><code>area</code>는 29%가 비었다. 중앙값으로 채워야 하는데 <b>지금 전체 중앙값으로 채우면 안 된다.</b> 그 값에는 <span class="tt" data-tip="검증 데이터는 '아직 안 본 새 데이터'여야 한다. 그 값이 섞인 중앙값을 쓰면 이미 본 셈이 된다.">검증 데이터의 정보가 섞여</span> 있다(데이터 누수).</p>
+      <p class="rule">5단계에서 분할한 뒤, 학습 데이터의 중앙값으로 양쪽을 채운다.</p></div>
+  </section>
+
+    <section id="s3i">
+    <h2><span class="n">3-1</span>인사이트 도출 — 데이터가 말하는 것</h2>
+    <div class="note say"><span class="tag">설명</span><p>정제를 끝냈으면 <b>모델을 만들기 전에 데이터에게 먼저 물어야 한다.</b>
+    "어떤 조건일 때 부적합이 나오는가?" 를 <b>범주별 양성비율</b>로 집계하면 숫자가 대답해 준다.
+    여기서 읽은 것을 7단계에서 모델과 대조한다. <span class="rule">정제 후에 집계하는 이유</span> — 정제 전이라면
+    <code>충남</code>과 <code>충청남도</code>가 따로 잡혀 같은 지역의 비율이 둘로 쪼개진다.</p></div>
+    <pre>BASE = df[TARGET].mean()
+print('전체 부적합률 : %.2f%%   &lt;- 이 값이 기준선' % (BASE * 100))
+
+for col in ['수거단계', '양식', '품목', '시도']:
+    t = df.groupby(col)[TARGET].agg(['mean', 'count'])
+    t = t[t['count'] &gt;= 200].sort_values('mean', ascending=False)
+    print('\n[%s]  상위 3 / 하위 2  (200건 이상 범주만)' % col)
+    for name, r in pd.concat([t.head(3), t.tail(2)]).iterrows():
+        print('   %-16s %5.2f%%   n=%6d   기준선의 %5.2f배'
+              % (str(name)[:16], r['mean'] * 100, r['count'], r['mean'] / BASE))</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>전체 부적합률 : 1.12%   &lt;- 이 값이 기준선
+
+[수거단계]  상위 3 / 하위 2  (200건 이상 범주만)
+   생산                1.55%   n= 48183   기준선의  1.39배
+   유통/판매             0.06%   n= 19815   기준선의  0.05배
+
+[양식]  상위 3 / 하위 2  (200건 이상 범주만)
+   일반                1.17%   n= 65124   기준선의  1.04배
+   GAP(인증)           0.28%   n=   355   기준선의  0.25배
+   직불제(쌀소득)          0.00%   n=   532   기준선의  0.00배
+   친환경(인증) 무농약       0.00%   n=  1643   기준선의  0.00배
+   친환경(인증) 유기        0.00%   n=   260   기준선의  0.00배
+
+[품목]  상위 3 / 하위 2  (200건 이상 범주만)
+   백태                3.63%   n=  1241   기준선의  3.25배
+   멥쌀(일반)            2.08%   n= 16084   기준선의  1.86배
+   현미                1.89%   n= 12121   기준선의  1.69배
+
+[시도]  상위 3 / 하위 2  (200건 이상 범주만)
+   부산광역시             4.98%   n=  1346   기준선의  4.45배
+   대구광역시             2.48%   n=   565   기준선의  2.22배
+   충청남도              1.49%   n= 11249   기준선의  1.34배</pre></div>
+    <div class="note exp"><span class="tag">결과 설명 — 여기가 인사이트다</span>
+    <p><b>1. 수거단계가 압도적으로 갈린다.</b> <code>생산</code> 1.55% vs <code>유통/판매</code> 0.06% — <b>약 26배</b>다.
+    밭에서 캐자마자 검사하면 부적합이 나오지만, 유통 단계까지 올라온 것은 이미 걸러진 뒤다.
+    <span class="rule">검사 시점이 결과를 좌우한다.</span></p>
+    <p><b>2. 친환경·직불제 인증은 부적합이 0.00%</b> 다 (무농약 1,643건 · 유기 260건 · 직불제 532건 <b>전부 적합</b>).
+    반면 <code>일반</code> 재배는 1.17%. 인증 관리가 실제로 작동하고 있다.</p>
+    <p><b>3. 품목은 곡물이 위험하다.</b> <code>백태</code> 3.63%(3.3배) · <code>멥쌀(일반)</code> 2.08% · <code>현미</code> 1.89%.
+    토양의 중금속을 오래 흡수하는 작물이라는 해석과 맞는다.</p>
+    <p><b>4. 지역은 부산이 튄다.</b> <code>부산광역시</code> 4.98%(4.5배) · <code>대구광역시</code> 2.48%. 폐광산·공단 인접지가 의심된다.</p>
+    <p>→ 정리하면 <b>"생산 단계에서 수거한, 일반 재배 곡물, 특히 부산·대구산"</b> 이 위험하다.
+    이 가설을 모델이 실제로 배우는지 <a href="#s7">7단계</a>에서 확인한다.</p></div>
+  </section>
+  <section id="s4">
+    <h2><span class="n">4</span>타겟 분리 &amp; 인코딩</h2>
+    <div class="note say"><span class="tag">설명</span><p>글자를 숫자 코드로. 코드 열 이름은 <b>영문</b>으로 한다 — 이 이름이 그대로 API의 JSON 키가 된다.</p></div>
+    <pre>CODE = {'품목': 'item', '수거단계': 'stage', '양식': 'method', '시도': 'sido'}
+CATS = list(CODE.keys())
+
+OPTIONS = {}
+for c in CATS:
+    OPTIONS[c] = sorted(df[c].astype(str).unique())
+    df[CODE[c]] = df[c].astype(str).map({v: i for i, v in enumerate(OPTIONS[c])})
+
+FEATURES = [
+    {'name': 'item',   'label': '품목',         'kind': 'cat', 'options': OPTIONS['품목']},
+    {'name': 'stage',  'label': '수거단계',      'kind': 'cat', 'options': OPTIONS['수거단계']},
+    {'name': 'method', 'label': '재배양식',      'kind': 'cat', 'options': OPTIONS['양식']},
+    {'name': 'sido',   'label': '생산지(시도)',   'kind': 'cat', 'options': OPTIONS['시도']},
+    {'name': 'month',  'label': '검사 월',       'kind': 'num'},
+    {'name': 'area',   'label': '재배면적(㎡)',   'kind': 'num'},
+    {'name': 'volume', 'label': '조사물량(kg)',  'kind': 'num'},
+]</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>입력 X: (68106, 7) | 정답 y: (68106,)
+아직 남은 결측: {'area': 19932, 'volume': 12975}</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p><b>"아직 남은 결측"</b>이 핵심이다. 일부러 안 채우고 넘어간다 — 5단계에서 분할 뒤에 채운다.</p>
+      <p><code>분석결과</code>는 <b>타겟 그 자체</b>라 입력에서 뺐다. 남긴 7개는 <b>검사 전에 알 수 있는 정보</b>뿐이다.</p></div>
+  </section>
+
+  <section id="s5">
+    <h2><span class="n">5</span>검증 분할 &amp; 결측치 채우기</h2>
+    <div class="note say"><span class="tag">설명</span><p><span class="rule">순서가 중요하다.</span> 분할을 <b>먼저</b> 하고, <b>학습 데이터의 중앙값</b>으로 양쪽을 채운다.</p></div>
+    <pre>X_tr, X_te, y_tr, y_te = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y)
+
+# 결측 채우기 : 반드시 '학습 데이터(X_tr)' 의 중앙값으로 양쪽을 채운다 (누수 방지)
+X_tr, X_te = X_tr.copy(), X_te.copy()
+for c in ['area', 'volume']:
+    m = X_tr[c].median()                <span class="cmt"># &lt;- 전체가 아니라 학습 데이터 기준!</span>
+    X_tr[c] = X_tr[c].fillna(m)
+    X_te[c] = X_te[c].fillna(m)</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>area    중앙값     1432 로 채움
+volume  중앙값      500 로 채움
+
+학습: (54484, 7) | 검증: (13622, 7)
+학습 부적합 비율: 0.0112 | 검증 부적합 비율: 0.0112
+남은 결측: 0 0</pre></div>
+    <div class="note exp"><span class="tag">결과 설명 — 이 단원의 중급 포인트</span>
+      <p><b>검증 데이터도 학습 데이터의 중앙값(1432)으로 채웠다.</b> 검증 데이터 자신의 중앙값을 쓰지 않았다.</p>
+      <p>실제 서비스에서는 <span class="rule">새 데이터가 하나씩 들어온다. 그 하나의 중앙값이란 건 없다.</span> 학습 때 정한 값을 계속 쓰는 게 유일하게 맞는 방법이다.</p>
+      <p><code>stratify=y</code> 덕에 학습·검증의 부적합 비율이 <b>0.0112로 동일</b>하다.</p></div>
+  </section>
+
+  <section id="s6">
+    <h2><span class="n">6</span>모델 학습</h2>
+    <pre>model = RandomForestClassifier(n_estimators=100, max_depth=8, random_state=42,
+                               n_jobs=-1, class_weight='balanced')
+model.fit(X_tr, y_tr)</pre>
+    <div class="note exp"><span class="tag">결과 설명</span><p>부적합이 1.12% 뿐이라 <code>class_weight='balanced'</code> 가 <b>SAMPLE_1보다 더 절실하다.</b> 효과는 7단계에서 비교한다.</p></div>
+  </section>
+
+  <section id="s7">
+    <h2><span class="n">7</span>평가 - 정확도 vs ROC-AUC</h2>
+    <pre>pred  = model.predict(X_te)
+proba = model.predict_proba(X_te)[:, 1]      <span class="cmt"># 양성(부적합) 확률</span>
+acc = accuracy_score(y_te, pred)
+auc = roc_auc_score(y_te, proba)</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>정확도(Accuracy): 0.6519
+  전부 "적합"으로 찍기만 해도 : 0.9888   <span class="cmt">&lt;- 정확도의 함정</span>
+ROC-AUC        : 0.8147   <span class="cmt">&lt;- 진짜 실력 (0.5 = 찍기)</span>
+
+              precision    recall  f1-score   support
+
+          적합       1.00      0.65      0.79     13470
+         부적합       0.03      0.86      0.05       152
+
+    accuracy                           0.65     13622</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p><b>정확도 0.65는 "전부 적합"(0.9888)보다 한참 낮다.</b> 그런데도 이 모델이 훨씬 쓸모 있다.</p>
+      <p><b>ROC-AUC 0.8147</b> — SAMPLE_1(0.7131)보다 <b>높다.</b> 이 데이터가 더 예측하기 쉽다는 뜻이다(수거단계·재배양식이 강한 신호라서).</p>
+      <p>부적합 <b>recall 0.86</b> / <b>precision 0.03</b>. 152건 중 131건을 잡았지만, 부적합이라 지목한 4,852건 중 대부분이 헛경보다.</p></div>
+
+    <h3>7-1. 비교 — <code>class_weight='balanced'</code>를 빼면?</h3>
+    <div class="out"><div class="olabel">수행결과</div><pre>                           balanced 안씀 balanced 씀
+정확도                            0.9888     0.6519
+ROC-AUC                        0.8228     0.8147
+'부적합' recall                    0.000      0.862
+'부적합' 이라고 예측한 수                     0       4852
+실제 부적합 건수                         152        152</pre></div>
+    <div class="note exp"><span class="tag">결과 설명 — 반드시 이해할 것</span>
+      <p><b>balanced를 안 쓴 모델은 부적합을 단 한 건도 예측하지 않았다</b>(양성 예측 0건). 정확도 0.9888은 <span class="rule">전부 "적합"이라 찍은 결과</span>다. 검사 기관이 쓸 수 없다.</p>
+      <p><b>balanced를 쓰면 152건 중 131건(86%)을 잡는다.</b> 대신 4,852건을 부적합이라 지목한다.</p>
+      <p>식품 안전에서 <span class="tt" data-tip="부적합 농산물이 시중에 풀리는 것. 국민 건강 피해로 직결된다.">놓치는 것</span>은 <span class="tt" data-tip="적합인데 부적합이라 예측한 것. 정밀 검사를 한 번 더 하면 되니 비용만 든다.">헛경보</span>보다 훨씬 위험하다. <b>이 모델은 "정밀 검사 대상을 1차로 걸러내는 용도"</b>다. 최종 판정은 사람이 한다.</p></div>
+  </section>
+
+  <section id="s8">
+    <h2><span class="n">8</span>모델 저장</h2>
+    <pre>joblib.dump(model, '../02/model.pkl')
+json.dump(spec, open('../02/feature_spec.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>저장 완료: ../02/model.pkl, ../02/feature_spec.json
+
+--- 이 model.pkl 을 만든 환경 ---
+python      : 3.11.0
+numpy       : 2.4.6
+pandas      : 3.0.3
+scikit-learn: 1.9.0
+joblib      : 1.5.3</pre></div>
+    <div class="note warn"><span class="tag">중요</span><p>이 버전이 <code>../02/requirements.txt</code> 와 <b>다르면 02 서버가 뜨지 않는다</b>(<code>ModuleNotFoundError</code>). <code>model.pkl</code> 은 저장할 때의 라이브러리 버전에 묶이기 때문이다.</p></div>
+  </section>
+
+  <section id="wrap">
+    <h2>마무리 &amp; 다음</h2>
+    <h3>SAMPLE_2 에서 꼭 가져갈 것</h3>
+    <ol>
+      <li><b>데이터는 지저분하다.</b> 같은 지역이 두 이름(충남/충청남도)이면 모델은 다른 지역으로 배운다. <b>정제가 먼저다.</b></li>
+      <li><b>희소 범주는 묶는다.</b> 518종 중 상위 30개가 76%를 덮는다. 나머지는 '기타'로.</li>
+      <li><b>결측은 분할 뒤 학습 데이터 기준으로 채운다.</b> 전체 중앙값으로 채우면 누수다.</li>
+      <li>불균형(1.1%)에서 <b>정확도는 착시</b>. ROC-AUC와 recall을 본다.</li>
+    </ol>
+    <h3>SAMPLE_1과 비교</h3>
+    <table><tr><th></th><th>SAMPLE_1 (화재)</th><th>SAMPLE_2 (중금속)</th></tr>
+    <tr><td>양성 비율</td><td>3.9%</td><td><b>1.1%</b> (더 극단)</td></tr>
+    <tr><td>결측</td><td>없음</td><td><b>재배면적 29%</b></td></tr>
+    <tr><td>정제</td><td>불필요</td><td><b>표기 통일 · 희소범주</b></td></tr>
+    <tr><td>ROC-AUC</td><td>0.7131</td><td><b>0.8147</b></td></tr>
+    <tr><td>balanced 후 recall</td><td>0.529</td><td><b>0.862</b></td></tr></table>
+    <h3>자주 막히는 곳</h3>
+    <table><tr><th>증상</th><th>해결</th></tr>
+    <tr><td>UnicodeDecodeError</td><td><code>encoding='cp949'</code> 확인</td></tr>
+    <tr><td>그래프 한글이 □</td><td>1단계 <code>font.family = 'Malgun Gothic'</code> 확인</td></tr>
+    <tr><td>시도가 33종 그대로</td><td>3-1의 <code>replace(SIDO)</code> 실행 확인</td></tr>
+    <tr><td>5단계에서 결측이 안 없어짐</td><td><code>X_tr, X_te = X_tr.copy(), X_te.copy()</code> 를 빠뜨렸는지 확인</td></tr>
+    <tr><td>'부적합' recall이 0</td><td>정상 — <code>class_weight</code> 를 뺀 비교 모델(7-1)</td></tr></table>
+    <p class="lead">다음: <b>02. ML API</b> — 저장한 model.pkl 을 FastAPI(<b>포트 8002</b>)로 서비스합니다.</p>
+  </section>
+
+  <footer>빅데이터 분석 모델링 · SAMPLE_2 / 01 모델 학습 상세가이드 · 노트북: 모델학습.ipynb</footer>
+</div>
+</div>
+<script>
+(function(){var L=[].slice.call(document.querySelectorAll('.side a[href^="#"]'));var M={};L.forEach(function(a){var s=document.getElementById(a.getAttribute('href').slice(1));if(s)M[a.getAttribute('href').slice(1)]=a;});var ids=Object.keys(M);function f(){var cur=null;ids.forEach(function(id){if(document.getElementById(id).getBoundingClientRect().top<=120)cur=id;});L.forEach(function(a){a.classList.remove('act');});if(cur)M[cur].classList.add('act');}document.addEventListener('scroll',f,{passive:true});window.addEventListener('load',f);f();})();
+</script>
+</body>
+</html>

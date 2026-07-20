@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMPLE_1 / 01 모델 학습 - 상세가이드</title>
+<style>
+  :root{ --ink:#222; --muted:#777; --line:#eaeaea; --accent:#2f6feb; --do:#1a9e6a; --code:#f5f6f8; --out:#f2f8f4; --out-b:#cfe6d8; --warn:#d9822b; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic",sans-serif;line-height:1.75;font-size:16px}
+  .wrap{max-width:840px;margin:0 auto;padding:44px 22px 90px}
+  .kicker{color:var(--accent);font-weight:600;font-size:13px}
+  h1{margin:8px 0 6px;font-size:26px;font-weight:700}.sub{color:var(--muted);margin:0 0 12px}.meta{color:var(--muted);font-size:14px;margin:0 0 4px}
+  .flow{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px 15px;margin:14px 0;font-size:14px;color:#444}.flow b{color:var(--accent)}
+  .hint{font-size:13px;color:var(--muted);margin:8px 0 0}
+  section{padding:26px 0;border-bottom:1px solid var(--line)}section:last-of-type{border-bottom:none}
+  h2{margin:0 0 4px;font-size:19px;font-weight:700}h2 .n{color:var(--accent);margin-right:8px}h3{margin:18px 0 4px;font-size:16px}
+  .lead{color:var(--muted);margin:2px 0 10px}
+  .note{margin:12px 0;padding-left:14px;border-left:3px solid var(--line)}.note .tag{font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase}
+  .note.do{border-left-color:var(--do)}.note.do .tag{color:var(--do)}.note.say{border-left-color:var(--accent)}.note.say .tag{color:var(--accent)}
+  .note.exp{border-left-color:var(--do);background:#fbfefc}.note.exp .tag{color:var(--do)}.note p{margin:3px 0}
+  .note.warn{border-left-color:var(--warn);background:#fffdf7}.note.warn .tag{color:var(--warn)}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:13px 15px;overflow:auto;font-family:Consolas,"D2Coding",monospace;font-size:13.5px;line-height:1.6;margin:12px 0;color:#1b1f24}pre .cmt{color:#9aa0a6}
+  .out{margin:10px 0}
+  .out .olabel{font-size:12px;font-weight:700;color:var(--do);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px}
+  .out pre{background:var(--out);border:1px solid var(--out-b);color:#123}
+  .out pre .trunc{color:#9aa0a6}
+  .out.pred .olabel{color:var(--warn)}
+  .out.pred pre{background:#fffdf7;border-color:#f0dcc0}
+  code{background:#f0f1f3;border-radius:5px;padding:1px 6px;font-family:Consolas,monospace;font-size:14px}
+  ul,ol{margin:8px 0;padding-left:20px}li{margin:3px 0}.rule{font-weight:700;color:var(--accent)}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}th,td{border:1px solid var(--line);padding:7px 10px;text-align:left}th{background:#fafbfc}
+  .tt{border-bottom:1px dotted var(--accent);cursor:help;position:relative}
+  .tt:hover::after{content:attr(data-tip);position:absolute;left:0;bottom:135%;background:#222;color:#fff;padding:7px 10px;border-radius:6px;font-size:12.5px;font-weight:400;line-height:1.55;white-space:normal;width:max-content;max-width:280px;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  .tt:hover::before{content:'';position:absolute;left:12px;bottom:120%;border:6px solid transparent;border-top-color:#222;z-index:20}
+  footer{color:var(--muted);font-size:13px;margin-top:32px}
+  .layout{display:flex;align-items:flex-start;max-width:1180px;margin:0 auto}
+  .side{position:sticky;top:0;align-self:flex-start;flex:0 0 190px;max-height:100vh;overflow-y:auto;padding:44px 14px 40px;border-right:1px solid var(--line);font-size:13.5px}
+  .side-title{font-weight:700;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;padding-left:8px}
+  .side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .side a:hover{background:var(--code);color:var(--accent)}
+  .side a.act{color:var(--accent);font-weight:600;background:var(--code)}
+  .layout .wrap{margin:0 auto}
+  .src{font-size:13px;color:var(--muted);margin:8px 0 0}.src a{color:var(--accent);text-decoration:none;border-bottom:1px solid #cfe0ff}.src a:hover{border-bottom-color:var(--accent)}
+  .ds{margin:14px 0;border:1px solid var(--line);border-radius:8px;background:#fcfdff}
+  .ds>summary{cursor:pointer;padding:11px 15px;font-weight:700;font-size:14px;color:var(--accent);list-style:none}
+  .ds>summary::-webkit-details-marker{display:none}
+  .ds>summary::before{content:"\25B8  "}
+  .ds[open]>summary::before{content:"\25BE  "}
+  .ds .dsbody{padding:2px 15px 14px}
+  .ds h4{margin:15px 0 4px;font-size:14px;color:var(--ink);border-left:3px solid var(--accent);padding-left:8px}
+  .ds p{margin:4px 0;font-size:14px}
+  .ds table{margin:6px 0;font-size:13.5px}
+  .ds .approach{padding-left:2px;margin:5px 0}
+  .ds .tag2{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:10px;background:var(--code);color:var(--accent);margin-right:6px}
+  @media (max-width:760px){.layout{flex-direction:column}.side{position:static;flex:none;width:100%;max-height:none;border-right:none;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:2px;padding:14px}.side-title{width:100%}}
+  @media print{.side{display:none}.layout{display:block}section{page-break-inside:avoid}.tt{border:none}}
+</style>
+</head>
+<body>
+<div class="layout"><nav class="side"><div class="side-title">목차</div><a href="#concept">개념</a><a href="#data">데이터 해석</a><a href="#s1">1. 로드</a><a href="#s2">2. EDA</a><a href="#s3">3. 결측치</a><a href="#s4">4. 인코딩</a><a href="#s5">5. 분할</a><a href="#s6">6. 학습</a><a href="#s7">7. 평가</a><a href="#s8">8. 저장</a><a href="#wrap">마무리</a></nav>
+  <div class="wrap">
+  <div class="kicker">실습 상세가이드 · 빅데이터 분석 모델링 · SAMPLE_1 / 01</div>
+  <h1>01. 모델 학습 — 서울 화재 인명피해 예측</h1>
+  <p class="sub">공공데이터포털의 소방청 화재 데이터로 "이 화재에 인명피해가 있을까"를 맞힌다. 학습한 모델을 02·03에서 서비스한다.</p>
+  <p class="meta">대상: 비전공 초보 · 소요: 약 2시간 · 데이터: data/소방청_화재발생정보_서울.csv (26,760건) · 산출물: ../02/model.pkl</p>
+  <div class="flow"><b>워크플로우</b> — 로드 → EDA → 결측치 → 타겟분리·인코딩 → 분할(stratify) → 학습 → 평가(ROC-AUC) → 저장. <b>이 뼈대가 모든 이진분류에 그대로</b> 반복됩니다.</div>
+<p class="src">데이터 출처: <a href="https://www.data.go.kr/data/15044003/fileData.do" target="_blank" rel="noopener">공공데이터포털 &gt; 소방청_화재발생 정보 (data.go.kr/data/15044003)</a>
+  &nbsp;|&nbsp; 제공기관 <b>소방청</b> &nbsp;|&nbsp; 파일 <b>CSV</b> &nbsp;|&nbsp; 라이선스 이용허락범위 제한 없음</p>
+  <details class="ds"><summary>데이터셋 자세히 보기 — 컬럼 의미 · 출처 · 접근법 · 활용 방식</summary>
+  <div class="dsbody">
+    <h4>개요</h4>
+    <p>전국 화재조사관이 <b>국가화재정보시스템</b>에 입력한 화재 조사 기록. <b>화재 1건 = 1행</b>이다.
+    원본은 2020.01.01 ~ 2024.12.31 전국 <b>191,510건</b>이며, 이 실습은 <b>서울특별시 26,760건</b>만 추려 쓴다(시도 열은 값이 하나뿐이라 제외).</p>
+    <p>서울 26,760건 중 인명피해가 난 화재는 <b>1,051건(3.9%)</b> — 사망 발생 140건, 부상 발생 944건이다.</p>
+
+    <h4>컬럼 의미 (14열)</h4><table><tr><th style="width:130px">컬럼</th><th>의미</th><th style="width:150px">실습에서</th></tr>
+    <tr><td>화재발생년원일</td><td>발생 일시 (예: <code>2020-01-01 0:03</code>)</td><td><b>입력</b> — 월·시간대를 뽑아 씀</td></tr>
+    <tr><td>시군구</td><td>서울 25개 자치구</td><td><b>입력</b></td></tr>
+    <tr><td>화재유형</td><td>무엇이 탔는가 (6종)</td><td><b>입력</b></td></tr>
+    <tr><td>발화요인대분류</td><td>왜 불이 났는가 (12종)</td><td><b>입력</b></td></tr>
+    <tr><td>발화요인소분류</td><td>발화요인 세부 (49종)</td><td>미사용 — 대분류로 충분</td></tr>
+    <tr><td>장소대분류</td><td>어디서 났는가 (15종)</td><td><b>입력</b></td></tr>
+    <tr><td>장소중분류</td><td>장소 세부 (47종)</td><td><b>입력</b></td></tr>
+    <tr><td>장소소분류</td><td>장소 최세부 (364종)</td><td>미사용 — 너무 잘게 나뉨</td></tr>
+    <tr><td>인명피해(명)소계</td><td>사망 + 부상 인원</td><td><b>타겟 원천</b> — 0명 초과면 1</td></tr>
+    <tr><td>사망 / 부상</td><td>각각의 인원</td><td><b>제외</b> — 타겟 그 자체(누수)</td></tr>
+    <tr><td>재산피해소계</td><td>피해 금액(천원). 중앙값 121천원, 최대 25억</td><td><b>제외</b> — 조사 후 확정되는 결과값(누수)</td></tr>
+    <tr><td>부동산 / 동산</td><td>재산피해 내역 (결측 855건)</td><td><b>제외</b> — 결과값</td></tr></table>
+
+    <h4>출처 · 받는 방법</h4>
+    <p><b>공공데이터포털(data.go.kr)</b> → 데이터 <code>15044003</code> 페이지 → <b>다운로드</b> 버튼 (로그인 불필요).
+    받으면 파일명은 <code>소방청_화재발생 정보_20241231.csv</code>, 인코딩은 <b>cp949</b>, 크기 약 22MB.</p>
+    <p>이 폴더의 <code>data/소방청_화재발생정보_서울.csv</code> 는 그 원본에서 <b>서울만 필터링</b>해 둔 것(2.8MB)이라 바로 <code>pd.read_csv</code> 하면 된다.</p>
+
+    <h4>가능한 머신러닝 방식</h4>
+    <p class="approach"><span class="tag2">이진분류</span>인명피해 발생 여부 — <b>이 단원의 과제</b></p>
+    <p class="approach"><span class="tag2">회귀</span>재산피해 금액(연속값) 예측</p>
+    <p class="approach"><span class="tag2">다중분류</span>발화요인대분류(12종)를 타겟으로 예측</p>
+    <p class="approach"><span class="tag2">군집화</span>자치구·장소·시간대로 화재 패턴 세그먼트 나누기(비지도)</p>
+  </div>
+</details>
+  <p class="hint">점선 밑줄 용어에 마우스를 올리면 툴팁 설명이 나옵니다. 각 단계는 코드 → 수행결과 → 결과 설명 순서입니다.</p>
+  <div class="flow" style="border-left:4px solid #d9822b"><b style="color:#d9822b">이 단원의 진짜 주제 — 불균형</b> — 인명피해가 있는 화재는 전체의 <b>3.9%</b>뿐입니다. 이런 데이터에서 <b>정확도는 착시</b>를 일으킵니다. 그 함정을 눈으로 확인하고 대처법(<code>class_weight</code>)까지 익히는 것이 목표입니다.</div>
+
+  <section id="concept">
+    <h2>핵심 개념 — 이진분류와 불균형</h2>
+    <div class="note say"><span class="tag">설명</span>
+      <p><b>이진분류</b>: 정답이 두 가지(인명피해 있음 / 없음)인 문제. 모델은 특성(X)을 보고 정답(y)을 맞히는 규칙을 학습한다.</p>
+      <p>이 데이터의 정답은 <b>직접 만든다</b>. 인명피해 <b>인원수</b>가 들어 있으므로 <span class="tt" data-tip="1명이라도 다치거나 사망하면 1, 아무도 없으면 0. 연속값을 두 덩어리로 나눠 이진분류 문제로 바꾼다.">1명이라도 있으면 1, 없으면 0</span>으로 바꾼다.</p></div>
+    <p class="lead">비유: 소방서에서 "이 신고, 사람이 다칠 가능성이 큰가?"를 출동 전에 가늠하는 일. 다만 실제 화재의 96%는 인명피해가 없어서, "무조건 없다"고만 답해도 96점을 받는 <span class="tt" data-tip="한 클래스가 다른 클래스보다 훨씬 많은 상태. 정확도가 무의미해진다.">불균형</span> 함정이 있다.</p>
+  </section>
+
+  <section id="data">
+    <h2>데이터 해석 — 안에 무엇이 들어 있나</h2>
+    <div class="note say"><span class="tag">설명</span><p>모델을 만들기 전에 <b>데이터가 무슨 말을 하는지</b> 먼저 읽는다. 아래 숫자는 서울 26,760건을 직접 집계한 것이고, <span class="rule">전체 평균 인명피해율은 3.9%</span> 다. 이보다 높으면 위험한 조건이다.</p></div>
+
+    <h3>화재유형 — 무엇이 탔는가 (6종)</h3>
+    <table><tr><th style="width:170px">값</th><th style="width:110px">건수</th><th style="width:80px">비중</th><th>인명피해율</th></tr>
+    <tr><td>건축,구조물</td><td>20,402</td><td>76.2%</td><td><b>4.8%</b></td></tr>
+    <tr><td>기타(쓰레기 화재등)</td><td>4,382</td><td>16.4%</td><td><b>0.7%</b></td></tr>
+    <tr><td>자동차,철도차량</td><td>1,859</td><td>6.9%</td><td>2.4%</td></tr>
+    <tr><td>임야</td><td>109</td><td>0.4%</td><td>0.0%</td></tr>
+    <tr><td>위험물,가스제조소등 / 선박,항공기</td><td>8</td><td>0.0%</td><td>0.0%</td></tr></table>
+    <div class="note exp"><span class="tag">해석</span><p>서울 화재의 <b>4건 중 3건이 건물</b>이다. 그리고 <span class="rule">건물 화재(4.8%)는 쓰레기 화재(0.7%)보다 인명피해가 7배 가까이 잦다</span> — 사람이 안에 있기 때문. 임야·선박은 서울에 거의 없어 몇 건뿐이니 <span class="tt" data-tip="건수가 적은 범주는 모델이 배울 근거가 부족하다. 예측이 불안정할 수 있다.">모델이 배울 게 없다</span>.</p></div>
+
+    <h3>발화요인 — 왜 불이 났는가 (12종)</h3>
+    <table><tr><th style="width:170px">값</th><th style="width:110px">건수</th><th style="width:80px">비중</th><th>인명피해율</th></tr>
+    <tr><td>부주의</td><td>14,744</td><td>55.1%</td><td>3.1%</td></tr>
+    <tr><td>전기적 요인</td><td>7,036</td><td>26.3%</td><td>2.7%</td></tr>
+    <tr><td>미상</td><td>2,471</td><td>9.2%</td><td><b>8.9%</b></td></tr>
+    <tr><td>기계적 요인</td><td>1,204</td><td>4.5%</td><td>1.9%</td></tr>
+    <tr><td><b>방화</b></td><td>274</td><td>1.0%</td><td><b>20.1%</b></td></tr>
+    <tr><td><b>방화의심</b></td><td>218</td><td>0.8%</td><td><b>18.3%</b></td></tr>
+    <tr><td><b>가스누출(폭발)</b></td><td>85</td><td>0.3%</td><td><b>32.9%</b></td></tr>
+    <tr><td>화학적 요인 / 기타 / 제품결함 / 교통사고</td><td>696</td><td>2.6%</td><td>4~7%</td></tr>
+    <tr><td>자연적인 요인</td><td>32</td><td>0.1%</td><td>0.0%</td></tr></table>
+    <div class="note exp"><span class="tag">해석 — 이 표가 모델의 핵심 근거다</span>
+      <p><b>가장 흔한 원인이 가장 위험한 건 아니다.</b> 절반 이상(55%)이 <b>부주의</b>지만 인명피해율은 3.1%로 평균 수준이다. 반대로 <b>가스누출(폭발) 32.9%</b>, <b>방화 20.1%</b>, <b>방화의심 18.3%</b> 는 건수는 1%대로 드물지만 <span class="rule">평균의 5~8배로 위험하다</span>.</p>
+      <p><b>미상 8.9%</b> 도 눈여겨볼 값이다. 원인을 못 밝힌 화재가 평균의 2배 이상 위험하다 — <span class="tt" data-tip="크게 타버려 원인을 특정할 수 없었을 가능성. 결측이나 '미상'이 무의미한 값이 아니라 그 자체로 신호일 수 있다.">심하게 탄 화재일수록 원인 규명이 어렵기 때문</span>으로 볼 수 있다.</p>
+      <p>4단계에서 발화요인을 입력에 넣는 이유가 여기 있다. <b>모델은 이 표를 학습한다.</b></p></div>
+
+    <h3>장소 — 어디서 났는가</h3>
+    <table><tr><th style="width:170px">장소(대분류)</th><th style="width:110px">건수</th><th style="width:80px">비중</th><th>인명피해율</th></tr>
+    <tr><td><b>주거</b></td><td>10,587</td><td>39.6%</td><td><b>6.0%</b></td></tr>
+    <tr><td>기타(야외 등)</td><td>4,382</td><td>16.4%</td><td><b>0.7%</b></td></tr>
+    <tr><td>생활서비스</td><td>4,032</td><td>15.1%</td><td>3.0%</td></tr>
+    <tr><td>판매,업무시설</td><td>3,463</td><td>12.9%</td><td>3.6%</td></tr>
+    <tr><td>자동차,철도차량</td><td>1,859</td><td>6.9%</td><td>2.4%</td></tr>
+    <tr><td>산업시설 / 교육시설</td><td>1,092</td><td>4.1%</td><td>4.9% / 5.4%</td></tr></table>
+    <p style="margin-top:14px"><b>장소(중분류) 상위</b></p>
+    <table><tr><th style="width:170px">값</th><th style="width:110px">건수</th><th>인명피해율</th></tr>
+    <tr><td><b>단독주택</b></td><td>4,088</td><td><b>7.1%</b></td></tr>
+    <tr><td>공동주택(아파트 등)</td><td>6,323</td><td><b>5.3%</b></td></tr>
+    <tr><td>일상서비스</td><td>1,012</td><td>4.4%</td></tr>
+    <tr><td>판매시설</td><td>1,013</td><td>3.8%</td></tr>
+    <tr><td>일반업무</td><td>2,127</td><td>2.8%</td></tr>
+    <tr><td>음식점</td><td>2,760</td><td>2.4%</td></tr>
+    <tr><td><b>야외</b></td><td>4,153</td><td><b>0.6%</b></td></tr></table>
+    <div class="note exp"><span class="tag">해석</span>
+      <p><b>사람이 사는 곳이 위험하다.</b> 주거 6.0% vs 야외 0.6% — <span class="rule">10배 차이</span>. 야외 쓰레기 화재가 건수는 많아도(4,153건) 다치는 사람은 거의 없다.</p>
+      <p>주거 안에서도 <b>단독주택 7.1% &gt; 공동주택 5.3%</b> 다. 아파트가 소방 설비·피난 통로 면에서 상대적으로 낫다고 해석할 수 있다.</p>
+      <p>02·03에서 <b>"야외 쓰레기 화재 → 인명피해 없음(98.9%)"</b> 이 나오는 근거가 바로 이 0.6% 다.</p></div>
+
+    <h3>시간대 · 월 · 자치구</h3>
+    <table><tr><th style="width:110px">항목</th><th>내용</th></tr>
+    <tr><td>위험한 시간</td><td><b>새벽 5시 8.5%</b>, 7시 6.0%, 3시 6.0%, 6시 5.8%, 2시 5.5%</td></tr>
+    <tr><td>안전한 시간</td><td>저녁 19시 2.6%, 20시 2.8%, 15시 2.9%</td></tr>
+    <tr><td>월</td><td>건수 최다 <b>12월</b>(2,517건) / 인명피해율 최고 <b>1월</b>(4.7%)</td></tr>
+    <tr><td>자치구 건수</td><td>강남구 2,024 · 송파구 1,691 · 영등포구 1,366</td></tr>
+    <tr><td>자치구 인명피해율</td><td>동대문구 7.2% · 중랑구 6.6% · 도봉구 5.2%</td></tr></table>
+    <div class="note exp"><span class="tag">해석 — 왜 새벽이 위험한가</span>
+      <p><b>새벽 5시(8.5%)가 저녁 7시(2.6%)의 3배 이상</b>이다. 이유는 어렵지 않다 — <span class="rule">자고 있어서 늦게 알아차리고 대피가 늦다.</span> 화재 건수 자체는 낮 시간대가 많지만, <b>다치는 비율</b>은 새벽이 압도적이다.</p>
+      <p>겨울(12월·1월)에 화재도 많고 인명피해율도 높다 — 난방·화기 사용이 늘기 때문.</p>
+      <p><b>자치구는 건수와 위험도가 따로 논다.</b> 강남구는 화재가 가장 많지만(2,024건) 인명피해율 상위는 동대문구·중랑구·도봉구다. <span class="tt" data-tip="상권이 크면 화재 건수는 많지만 사무실·상가 화재가 많다. 반면 노후 주거지가 많은 지역은 건수는 적어도 인명피해로 이어지기 쉽다.">"화재가 잦은 곳"과 "다치는 곳"은 다르다.</span></p></div>
+
+    <div class="note warn"><span class="tag">이 해석이 실습과 어떻게 연결되나</span>
+      <p>02·03에서 넣어 볼 두 입력이 바로 이 표들에서 나온 것이다.</p>
+      <p><b>고위험</b> = 건축,구조물(4.8%) + <b>방화(20.1%)</b> + <b>주거·공동주택(5.3%)</b> + <b>새벽 6시(5.8%)</b> → 모델 예측 <b>인명피해 있음 90.9%</b></p>
+      <p><b>저위험</b> = 기타 쓰레기 화재(0.7%) + 전기적 요인(2.7%) + <b>야외(0.6%)</b> + 저녁 21시 → 모델 예측 <b>인명피해 없음 98.9%</b></p>
+      <p class="rule">모델이 마법을 부리는 게 아니다. 이 표에 있는 규칙을 조합해 배운 것이다.</p></div>
+  </section>
+
+  <section id="s1">
+    <h2><span class="n">1</span>라이브러리 &amp; 데이터 로드</h2>
+    <div class="note say"><span class="tag">설명</span><p>판다스로 CSV를 읽는다. 공공데이터 CSV는 <span class="tt" data-tip="한글 윈도우에서 쓰는 인코딩. utf-8로 읽으면 UnicodeDecodeError가 난다.">cp949</span> 인코딩이다. 읽자마자 <b>타겟(정답)</b>을 만든다.</p></div>
+    <pre>import pandas as pd, numpy as np, json, joblib
+import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, roc_curve
+
+plt.rcParams['font.family'] = 'Malgun Gothic'   <span class="cmt"># 그래프 한글 깨짐 방지</span>
+plt.rcParams['axes.unicode_minus'] = False
+
+df = pd.read_csv('data/소방청_화재발생정보_서울.csv', encoding='cp949')
+
+<span class="cmt"># 정답(타겟) 만들기 : 인명피해가 1명이라도 있으면 1</span>
+TARGET = '인명피해여부'
+LABELS = ['인명피해 없음', '인명피해 있음']
+df[TARGET] = (pd.to_numeric(df['인명피해(명)소계'], errors='coerce').fillna(0) &gt; 0).astype(int)
+print('데이터 크기(행, 열):', df.shape)</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>데이터 크기(행, 열): (26760, 15)</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p>26,760건의 화재, 15개 열(원본 14열 + 방금 만든 <code>인명피해여부</code>). <span class="tt" data-tip="(행 개수, 열 개수). 데이터의 크기.">shape</span>가 이렇게 나오면 정상입니다.</p>
+      <p><code>plt.rcParams['font.family']</code>를 빼먹으면 2단계 그래프의 한글이 <b>□□□</b>로 깨집니다.</p></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="n">2</span>EDA — 데이터 파악</h2>
+    <div class="note say"><span class="tag">설명</span><p>타겟 분포와 결측치를 확인한다. <span class="rule">여기서 본 것이 6·7단계를 결정한다.</span></p></div>
+    <h3>2-1. 타겟 분포</h3>
+    <pre>print(df[TARGET].value_counts())
+print('인명피해 발생 비율:', round(df[TARGET].mean(), 4))</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>인명피해여부
+0    25709
+1     1051
+Name: count, dtype: int64
+인명피해 발생 비율: 0.0393</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p><span class="tt" data-tip="없음 25709건(96.1%), 있음 1051건(3.9%). 약 24배 차이.">없음 25,709 : 있음 1,051</span> → <span class="rule">심한 불균형</span>(양성이 3.9%).</p>
+      <p>이 관찰이 이 단원 전체의 근거입니다. <b>전부 "없음"이라고만 찍어도 정확도 96%</b>가 나온다는 뜻이니까요.</p></div>
+
+    <h3>2-2. 결측치 확인</h3>
+    <pre>print(df.isnull().sum())</pre>
+    <div class="out"><div class="olabel">수행결과 (0이 아닌 열만)</div><pre>부동산          855
+동산           855
+<span class="trunc">... (나머지 열은 결측치 0)</span></pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p><span class="tt" data-tip="비어 있는 값(Not a Number). 모델은 이게 있으면 학습을 못 한다.">결측치(NaN)</span>는 <b>부동산·동산에만</b> 855건. 그런데 이 두 열은 <b>어차피 입력에서 뺄 열</b>(4단계 누수 설명 참고)이라 실습에 영향이 없습니다.</p></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="n">3</span>전처리 — 결측치 처리</h2>
+    <div class="note say"><span class="tag">설명</span><p>날짜에서 <b>월·시간대</b>를 뽑는다(화재는 계절·시간대의 영향을 받는다). 그리고 사용할 열에 결측이 있는 행을 정리한다.</p></div>
+    <pre>dt = pd.to_datetime(df['화재발생년원일'], errors='coerce')
+df['월']     = dt.dt.month
+df['시간대'] = dt.dt.hour
+
+CATS = ['시군구', '화재유형', '발화요인대분류', '장소대분류', '장소중분류']
+before = len(df)
+df = df.dropna(subset=CATS + ['월', '시간대', TARGET])
+print('결측 행 제거: %d행 -&gt; %d행' % (before, len(df)))</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>결측 행 제거: 26760행 -&gt; 26760행</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p><b>0행 제거 = 정상</b>입니다. 사용할 열에는 결측이 없기 때문(2단계에서 확인). <code>dropna</code>는 숫자 변환 실패 시를 대비한 <b>안전장치</b>입니다.</p>
+      <p><span class="tt" data-tip="날짜에서 뽑아낸 새 입력. 원본에 없던 정보를 만들어 모델을 돕는 것을 특성 공학(feature engineering)이라 한다.">월·시간대</span>는 원본에 없던 열을 만든 것입니다.</p></div>
+    <div class="note warn"><span class="tag">중급 포인트 — 누수 방지</span><p>여기선 채울 게 없었지만, 결측을 <b>중앙값·최빈값으로 채운다면</b> 전체 데이터가 아니라 <span class="rule">학습 데이터(train) 기준으로</span> 채워야 합니다. 전체 기준으로 채우면 검증 데이터 정보가 학습에 새어 들어가(<span class="tt" data-tip="평가에 쓸 정보가 학습에 새어드는 것. 실제보다 성능이 부풀려진다.">데이터 누수</span>) 성능이 실제보다 좋아 보입니다.</p></div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="n">4</span>타겟 분리 &amp; 인코딩</h2>
+    <div class="note say"><span class="tag">설명</span><p>글자(범주형)는 모델이 못 읽으니 숫자 코드로 바꾼다. 그리고 입력 X와 정답 y를 나눈다.</p></div>
+    <pre><span class="cmt"># 코드 열 이름은 영문으로. 이 이름이 그대로 API 의 JSON 키가 된다.</span>
+CODE = {'시군구': 'gu', '화재유형': 'fire_type', '발화요인대분류': 'cause',
+        '장소대분류': 'place_main', '장소중분류': 'place_sub'}
+
+OPTIONS = {}
+for c in CATS:
+    OPTIONS[c] = sorted(df[c].unique())
+    df[CODE[c]] = df[c].map({v: i for i, v in enumerate(OPTIONS[c])})
+
+df['month'] = df['월']
+df['hour']  = df['시간대']
+
+FEATURES = [
+    {'name': 'gu',        'label': '자치구',      'kind': 'cat', 'options': OPTIONS['시군구']},
+    {'name': 'fire_type',      'label': '화재유형',    'kind': 'cat', 'options': OPTIONS['화재유형']},
+    {'name': 'cause', 'label': '발화요인',    'kind': 'cat', 'options': OPTIONS['발화요인대분류']},
+    {'name': 'place_main',    'label': '장소(대분류)', 'kind': 'cat', 'options': OPTIONS['장소대분류']},
+    {'name': 'place_sub',    'label': '장소(중분류)', 'kind': 'cat', 'options': OPTIONS['장소중분류']},
+    {'name': '월',                'label': '월',          'kind': 'num'},
+    {'name': '시간대',            'label': '시간대(0~23)', 'kind': 'num'},
+]
+X = df[[f['name'] for f in FEATURES]]
+y = df[TARGET].astype(int)
+print('입력 X:', X.shape, '| 정답 y:', y.shape)</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>입력 X: (26760, 7) | 정답 y: (26760,)</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p>15개 열 중 <b>7개만</b> 입력으로 남겼습니다. 무엇을 왜 뺐는지가 아래 두 상자의 내용이고, 이 단원에서 가장 중요한 판단입니다.</p></div>
+    <div class="note warn"><span class="tag">중급 포인트 — 무엇을 입력에서 빼야 하나</span>
+      <p><code>사망</code>·<code>부상</code>·<code>인명피해(명)소계</code>는 <span class="rule">타겟 그 자체</span>입니다. 입력에 넣으면 정답 보고 정답 맞히기라 반드시 뺍니다.</p>
+      <p><code>재산피해</code>도 화재 조사가 끝나야 나오는 <span class="tt" data-tip="예측 시점에는 알 수 없고 사건이 끝난 뒤에야 확정되는 값. 이런 걸 입력에 넣으면 현실에서 못 쓰는 모델이 된다.">사후 결과값</span>이라 뺐습니다.</p>
+      <p>남긴 7개는 <b>화재 상황에서 바로 알 수 있는 정보</b>뿐입니다 — 자치구·화재유형·발화요인·장소(대/중)·월·시간대.</p></div>
+    <div class="note warn"><span class="tag">중급 포인트 — 왜 코드 열 이름을 영문으로 하나</span>
+      <p>이 이름이 그대로 <b>API 의 JSON 키</b>가 됩니다(02). 한글 키로 만들면 윈도우 터미널에서 <code>curl</code> 로 보낼 때
+      인코딩이 깨져 <code>{"detail":"There was an error parsing the body"}</code> 가 납니다.</p>
+      <p>화면에 보이는 이름은 <code>label</code>(한글)이 따로 담당합니다. <span class="rule">기계가 쓰는 이름은 영문, 사람이 보는 이름은 한글</span> — 실무의 기본 원칙입니다.</p></div>
+    <div class="note say"><span class="tag">왜 원핫 인코딩이 아닌가</span>
+      <p>교과서 워크플로우는 <span class="tt" data-tip="범주값 각각을 0/1 열로 펼치는 것. 예: 자치구 25개 → 25개의 0/1 열.">원핫 인코딩(get_dummies)</span>을 씁니다. 여기서 <b>정수 코드</b>를 쓰는 이유는 두 가지입니다.</p>
+      <p>1) <b>서빙 계약</b>: 02의 FastAPI가 <code>feature_spec.json</code>의 <code>options</code> <b>인덱스 번호</b>를 그대로 받아 예측합니다. 원핫이면 열이 100개 넘게 흩어져 화면·API가 복잡해집니다.<br>
+      2) <b>트리 모델</b>: RandomForest는 정수 코드로도 구간을 잘 나눕니다(선형모델이라면 원핫이 필요).</p>
+      <p class="rule">핵심: 학습할 때의 코드 순서와 서빙할 때의 순서가 반드시 같아야 한다. 그래서 OPTIONS를 그대로 feature_spec.json에 저장한다(8단계).</p></div>
+  </section>
+
+  <section id="s5">
+    <h2><span class="n">5</span>검증 데이터 분할</h2>
+    <div class="note say"><span class="tag">설명</span><p>학습용/검증용으로 나눈다. <span class="tt" data-tip="나눌 때 클래스 비율(96:4)을 양쪽에 똑같이 유지하는 옵션.">stratify</span>가 <b>불균형에서 특히 중요</b>하다.</p></div>
+    <pre>X_tr, X_te, y_tr, y_te = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y)
+print('학습:', X_tr.shape, '| 검증:', X_te.shape)
+print('학습 인명피해 비율:', round(y_tr.mean(), 4), '| 검증 인명피해 비율:', round(y_te.mean(), 4))</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>학습: (21408, 7) | 검증: (5352, 7)
+학습 인명피해 비율: 0.0393 | 검증 인명피해 비율: 0.0392</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span><p>양쪽 비율이 <b>0.0393 / 0.0392</b>로 거의 같습니다 — <code>stratify=y</code>가 한 일입니다. 이걸 안 하면 양성이 4%뿐이라 <b>검증셋에 양성이 거의 안 들어가는</b> 사고가 날 수 있습니다.</p></div>
+  </section>
+
+  <section id="s6">
+    <h2><span class="n">6</span>모델 학습 — 랜덤포레스트</h2>
+    <div class="note say"><span class="tag">설명</span><p><span class="tt" data-tip="여러 개의 결정트리(스무고개)를 만들어 다수결로 예측하는 모델. 강력하고 손이 덜 가서 첫 모델로 좋다.">랜덤포레스트</span>를 학습한다. <code>class_weight='balanced'</code>가 <span class="rule">이번 실습의 핵심 장치</span>다.</p></div>
+    <pre>model = RandomForestClassifier(n_estimators=100, max_depth=8, random_state=42,
+                               n_jobs=-1, class_weight='balanced')
+model.fit(X_tr, y_tr)
+print('학습 완료:', model)</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>학습 완료: RandomForestClassifier(class_weight='balanced', max_depth=8, n_jobs=-1,
+                       random_state=42)</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p><span class="tt" data-tip="적은 쪽 클래스의 오답에 더 큰 벌점을 준다. 그래야 모델이 소수 클래스를 무시하지 않는다.">class_weight='balanced'</span>: 데이터가 96:4라 그냥 학습하면 모델은 <b>"전부 없음"이라 답하는 게 이득</b>이라고 배웁니다. 이 옵션은 적은 쪽(인명피해 있음)에 가중치를 크게 줘서 소수 클래스를 제대로 학습하게 만듭니다.</p>
+      <p><span class="tt" data-tip="트리의 최대 깊이. 제한하면 과적합이 줄고 저장 용량도 작아진다.">max_depth=8</span>: 과적합을 줄이고 <code>model.pkl</code> 용량도 억제(약 2.4MB).</p>
+      <p>효과는 바로 다음 단계에서 <b>직접 비교</b>합니다.</p></div>
+  </section>
+
+  <section id="s7">
+    <h2><span class="n">7</span>평가 — 정확도 vs ROC-AUC</h2>
+    <div class="note say"><span class="tag">설명</span><p><code>predict</code>는 0/1, <span class="tt" data-tip="각 데이터가 양성(1)일 확률. [:, 1]로 '1일 확률' 열만 뽑는다.">predict_proba(...)[:, 1]</span>는 양성일 확률. <span class="rule">불균형이라 정확도만 보면 안 된다.</span></p></div>
+    <pre>pred  = model.predict(X_te)
+proba = model.predict_proba(X_te)[:, 1]      <span class="cmt"># 양성(인명피해 있음) 확률 열</span>
+acc  = accuracy_score(y_te, pred)
+auc  = roc_auc_score(y_te, proba)
+base = 1 - y_te.mean()                       <span class="cmt"># 전부 '없음'으로만 찍었을 때</span>
+print('정확도(Accuracy):', round(acc, 4))
+print('  전부 "없음"으로 찍기만 해도 :', round(base, 4))
+print('ROC-AUC        :', round(auc, 4))
+print(classification_report(y_te, pred, target_names=LABELS, zero_division=0))</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>정확도(Accuracy): 0.7347
+  전부 "없음"으로 찍기만 해도 : 0.9608   <span class="cmt">&lt;- 정확도의 함정</span>
+ROC-AUC        : 0.7131   <span class="cmt">&lt;- 진짜 실력 (0.5 = 찍기)</span>
+
+              precision    recall  f1-score   support
+
+     인명피해 없음       0.97      0.74      0.84      5142
+     인명피해 있음       0.08      0.53      0.14       210
+
+    accuracy                           0.73      5352</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p>정확도 0.73은 "전부 없음"(0.96)보다 <b>낮습니다</b>. 그런데도 이 모델이 더 좋습니다 — 왜인지는 아래 비교에서 드러납니다.</p>
+      <p><span class="tt" data-tip="양성/음성을 얼마나 잘 구분하는가. 0.5=랜덤(찍기), 1=완벽.">ROC-AUC 0.7131</span>은 0.5(찍기)보다 확실히 높습니다. 모델이 실제로 위험한 화재를 구분하고 있다는 뜻입니다.</p>
+      <p>'인명피해 있음'의 <span class="tt" data-tip="실제 양성 중 맞힌 비율. 0.53 = 인명피해 화재의 절반 이상을 잡아냈다.">recall 0.53</span> / <span class="tt" data-tip="양성이라 예측한 것 중 실제 양성 비율. 0.08 = 헛경보가 많다.">precision 0.08</span>. 절반을 잡는 대신 헛경보가 많습니다.</p></div>
+
+    <h3>7-1. 비교 — <code>class_weight='balanced'</code>를 빼면?</h3>
+    <div class="note say"><span class="tag">설명</span><p>같은 데이터·같은 설정에서 이 옵션만 빼고 학습해 비교한다. <span class="rule">불균형 실습의 핵심 장면이다.</span></p></div>
+    <pre>plain = RandomForestClassifier(n_estimators=100, max_depth=8, random_state=42, n_jobs=-1)
+plain.fit(X_tr, y_tr)
+p_pred = plain.predict(X_te)
+<span class="cmt"># ... 두 모델의 정확도 / ROC-AUC / recall / 양성 예측 수를 나란히 출력</span></pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>                       balanced 안씀  balanced 씀
+정확도                       0.9609     0.7347
+ROC-AUC                     0.7272     0.7131
+'있음' recall                 0.005      0.529
+'있음' 이라고 예측한 수              1       1432
+실제 있음 건수                     210        210</pre></div>
+    <div class="note exp"><span class="tag">결과 설명 — 이 표를 반드시 이해하고 넘어갈 것</span>
+      <p><b>balanced를 안 쓴 모델</b>: 정확도 <b>0.96</b>으로 훨씬 높은데, 실제 인명피해 화재 <b>210건 중 1건</b>만 잡았습니다. 정확도가 높은 이유는 단순합니다 — <span class="rule">전부 "없음"이라 찍었기 때문</span>. 현장에서 아무 쓸모가 없습니다.</p>
+      <p><b>balanced를 쓴 모델</b>: 정확도는 0.79로 떨어지지만 <b>절반(recall 0.53)을 잡아냅니다.</b> 대신 헛경보가 늘죠.</p>
+      <p>인명 안전에서는 <span class="tt" data-tip="False Negative. 실제로 인명피해가 났는데 없다고 예측한 것. 놓친 위험.">놓치는 것(FN)</span>이 <span class="tt" data-tip="False Positive. 인명피해가 없는데 있다고 예측한 것. 헛경보.">헛경보(FP)</span>보다 훨씬 위험하므로 이 교환이 타당합니다.</p>
+      <p class="rule">결론: 불균형에서 정확도는 착시다. ROC-AUC와 소수 클래스 recall을 봐라.</p></div>
+    <table>
+      <tr><th>지표</th><th>의미</th><th>언제 보나</th></tr>
+      <tr><td>정확도</td><td>전체 중 맞힌 비율</td><td>클래스가 균형일 때만</td></tr>
+      <tr><td>ROC-AUC</td><td>양성/음성 구분 정도(0.5~1)</td><td>불균형일 때 특히</td></tr>
+      <tr><td>recall</td><td>실제 양성 중 맞힌 비율</td><td>놓치면 안 될 때(인명·질병·사기)</td></tr>
+      <tr><td>precision</td><td>양성 예측 중 실제 양성 비율</td><td>헛경보 비용이 클 때</td></tr>
+    </table>
+  </section>
+
+  <section id="s8">
+    <h2><span class="n">8</span>모델 저장</h2>
+    <div class="note say"><span class="tag">설명</span><p>모델과 <b>입력 정의</b>를 02 폴더에 저장한다. <code>feature_spec.json</code>이 02의 API와 03의 화면을 <span class="rule">자동으로 만들어 준다</span>.</p></div>
+    <pre>TITLE = '서울 화재 인명피해 예측'
+DESC  = '자치구·화재유형·발화요인·장소·시기를 입력하면 해당 화재에 인명피해가 발생할지 예측합니다.'
+for f in FEATURES:                 <span class="cmt"># 수치형 입력 범위 자동 계산</span>
+    if f['kind'] == 'num':
+        s = X[f['name']]
+        f.update(min=int(np.floor(s.min())), max=int(np.ceil(s.max())), default=int(round(s.median())))
+spec = {'title': TITLE, 'description': DESC, 'target_labels': LABELS,
+        'accuracy': round(float(acc), 4), 'roc_auc': round(float(auc), 4), 'features': FEATURES}
+joblib.dump(model, '../02/model.pkl')
+json.dump(spec, open('../02/feature_spec.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+print('저장 완료: ../02/model.pkl, ../02/feature_spec.json')</pre>
+    <div class="out"><div class="olabel">수행결과</div><pre>저장 완료: ../02/model.pkl, ../02/feature_spec.json</pre></div>
+    <div class="note exp"><span class="tag">결과 설명</span>
+      <p><code>model.pkl</code>(약 2.4MB)과 <code>feature_spec.json</code>이 <b>02 폴더</b>에 생깁니다. spec에는 제목·라벨·성능·입력 정의(옵션 25/6/12/15/47개)가 들어갑니다.</p>
+      <p><span class="tt" data-tip="4단계에서 만든 OPTIONS가 그대로 저장된다. 서빙할 때 이 순서대로 인덱스를 해석해야 학습과 어긋나지 않는다.">options 배열</span>이 저장되기 때문에 02·03이 폼을 자동 생성할 수 있습니다.</p></div>
+  </section>
+
+  <section id="wrap">
+    <h2>마무리 &amp; 다음</h2>
+    <ul>
+      <li>뼈대: 로드 → EDA → 결측치 → 타겟분리·인코딩 → 분할(stratify) → 학습 → 평가(ROC-AUC) → 저장.</li>
+      <li>중급 포인트: <b>불균형은 ROC-AUC·recall</b> · <b>class_weight로 대응</b> · <b>누수 방지</b>(타겟/사후값 제외) · <code>predict_proba[:, 1]</code>.</li>
+    </ul>
+    <h3>자주 막히는 곳</h3>
+    <table><tr><th>증상</th><th>해결</th></tr>
+    <tr><td>UnicodeDecodeError</td><td><code>encoding='cp949'</code> 확인</td></tr>
+    <tr><td>그래프 한글이 □로 깨짐</td><td>1단계 <code>plt.rcParams['font.family'] = 'Malgun Gothic'</code> 실행 확인</td></tr>
+    <tr><td>'있음' recall이 0</td><td>정상 — <code>class_weight</code>를 뺀 비교 모델의 결과(7-1)</td></tr>
+    <tr><td>KeyError</td><td>셀을 위에서부터 순서대로 실행했는지 확인</td></tr>
+    <tr><td>8단계 저장 오류</td><td>노트북을 01 폴더에서 실행했는지, <code>../02</code>가 있는지 확인</td></tr></table>
+    <p class="lead">다음: <b>02. ML API</b> — 저장한 model.pkl을 FastAPI로 서비스하고 예측 이력을 CRUD로 관리합니다.</p>
+  </section>
+
+  <footer>빅데이터 분석 모델링 · SAMPLE_1 / 01 모델 학습 상세가이드 · 노트북: 모델학습.ipynb</footer>
+</div>
+</div>
+<script>
+(function(){var L=[].slice.call(document.querySelectorAll('.side a[href^="#"]'));var M={};L.forEach(function(a){var s=document.getElementById(a.getAttribute('href').slice(1));if(s)M[a.getAttribute('href').slice(1)]=a;});var ids=Object.keys(M);function f(){var cur=null;ids.forEach(function(id){if(document.getElementById(id).getBoundingClientRect().top<=120)cur=id;});L.forEach(function(a){a.classList.remove('act');});if(cur)M[cur].classList.add('act');}document.addEventListener('scroll',f,{passive:true});window.addEventListener('load',f);f();})();
+</script>
+</body>
+</html>

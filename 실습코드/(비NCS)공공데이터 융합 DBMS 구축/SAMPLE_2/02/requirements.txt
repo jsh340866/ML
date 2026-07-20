@@ -1,0 +1,8 @@
+# Versions must match the environment that trained model.pkl (see 01 step 8 output).
+# If they differ, the server fails to start with ModuleNotFoundError.
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+scikit-learn==1.9.0
+pandas==3.0.3
+numpy==2.4.6
+joblib==1.5.3
